@@ -1,0 +1,291 @@
+{
+	"openrpc": "1.2.6",
+	"info": {
+		"title": "Monero Daemon RPC",
+		"description": "JSON-RPC API for interacting with monero daemon (Actual RPC standard is based on monerod)",
+		"license": {
+			"name": "MIT License",
+			"url": "https://opensource.org/licenses/mit-license.php"
+		},
+		"version": "v1.4.5.0"
+	},
+	"externalDocs": {
+		"description": "Official Documentation",
+		"url": "https://github.com/monero-project/monero/blob/master/doc/rpc_api.md#daemon-rpc-calls"
+	},
+	"servers": [
+		{
+			"url": "http:\/\/{host}:{port}\/json_rpc",
+			"name": "Monero daemon address",
+			"summary": "Address of the monero daemon to interact with"
+		}
+	],
+	"components": {
+		"schemas": {
+			"GetInfoResponse": {
+				"type": "object",
+				"properties": {
+					"blockchainHeight": {
+						"type": "integer",
+						"description": "The current height of the blockchain."
+					},
+					"topBlockHash": {
+						"type": "string",
+						"format": "hex",
+						"description": "The hash of the top block in the blockchain."
+					}
+				}
+			},
+			"GetBlockCountResponse": {
+				"type": "object",
+				"properties": {
+					"count": {
+						"type": "integer",
+						"description": "Number of blocks in longest chain seen by the node."
+					},
+					"status": {
+						"type": "string",
+						"description": "General RPC error code. 'OK' means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					}
+				}
+			},
+			"GetBlockTemplateResponse": {
+				"type": "object",
+				"properties": {
+					"blocktemplate_blob": {
+						"type": "string",
+						"description": "Blob on which to try to mine a new block."
+					},
+					"blockhashing_blob": {
+						"type": "string",
+						"description": "Blob on which to try to find a valid nonce."
+					},
+					"difficulty": {
+						"type": "integer",
+						"description": "Least-significant 64 bits of the 128-bit network difficulty."
+					},
+					"difficulty_top64": {
+						"type": "integer",
+						"description": "Most-significant 64 bits of the 128-bit network difficulty."
+					},
+					"expected_reward": {
+						"type": "integer",
+						"description": "Coinbase reward expected to be received if block is successfully mined."
+					},
+					"height": {
+						"type": "integer",
+						"description": "Height on which to mine."
+					},
+					"next_seed_hash": {
+						"type": "string",
+						"description": "Hash of the next block to use as seed for Random-X proof-of-work."
+					},
+					"prev_hash": {
+						"type": "string",
+						"description": "Hash of the most recent block on which to mine the next block."
+					},
+					"reserved_offset": {
+						"type": "integer",
+						"description": "Reserved offset."
+					},
+					"seed_hash": {
+						"type": "string",
+						"description": "Hash of block to use as seed for Random-X proof-of-work."
+					},
+					"seed_height": {
+						"type": "integer",
+						"description": "Height of block to use as seed for Random-X proof-of-work."
+					},
+					"status": {
+						"type": "string",
+						"description": "General RPC error code. 'OK' means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (true), or when the daemon is fully synced and thus handles the RPC locally (false)"
+					},
+					"wide_difficulty": {
+						"type": "string",
+						"description": "Network difficulty (analogous to the strength of the network) as a hexadecimal string representing a 128-bit number."
+					}
+				}
+			},
+			"GenerateBlocksResponse": {
+				"type": "object",
+				"properties": {
+					"blocks": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"description": "List of block hashes."
+					},
+					"height": {
+						"type": "integer",
+						"description": "Height of the most recent block."
+					},
+					"status": {
+						"type": "string",
+						"description": "General RPC error code. 'OK' means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					}
+				}
+			}
+		}
+	},
+	"methods": [
+		{
+			"name": "get_block_count",
+			"description": "Look up how many blocks are in the longest chain known to the node.",
+			"params": [],
+			"result": {
+				"name": "GetBlockCountResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GetBlockCountResponse"
+				}
+			}
+		},
+		{
+			"name": "on_get_block_hash",
+			"description": "Look up a block's hash by its height.",
+			"params": [
+				{
+					"name": "block height",
+					"required": true,
+					"description": "integer array of length 1 (example: `[54666]`)",
+					"schema": {
+						"type": "array",
+						"items": {
+							"type": "integer"
+						}
+					}
+				}
+			],
+			"result": {
+				"name": "block hash",
+				"schema": {
+					"type": "string"
+				}
+			}
+		},
+		{
+			"name": "get_block_template",
+			"description": "Get a block template on which mining a new block.",
+			"params": [
+				{
+					"name": "wallet_address",
+					"required": true,
+					"description": "Address of wallet to receive coinbase transactions if block is successfully mined.",
+					"schema": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "reserve_size",
+					"required": true,
+					"description": "Reserve size.",
+					"schema": {
+						"type": "integer"
+					}
+				}
+			],
+			"result": {
+				"name": "GetBlockTemplateResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GetBlockTemplateResponse"
+				}
+			}
+		},
+		{
+			"name": "submit_block",
+			"description": "Submit a mined block to the network.",
+			"params": [
+				{
+					"name": "Block blob data",
+					"required": true,
+					"description": "list of block blobs which have been mined. See `get_block_template` to get a blob on which to mine.",
+					"schema": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			],
+			"result": {
+				"name": "status",
+				"description": "Block submit status.",
+				"schema": {
+					"type": "string"
+				}
+			}
+		},
+		{
+			"name": "generateblocks",
+			"description": "Submit a mined block to the network.",
+			"params": [
+				{
+					"name": "amount_of_blocks",
+					"required": true,
+					"description": "Number of blocks to be generated.",
+					"schema": {
+						"type": "integer"
+					}
+				},
+				{
+					"name": "wallet_address",
+					"required": true,
+					"description": "address to receive the coinbase reward.",
+					"schema": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "prev_block",
+					"required": false,
+					"description": "No description is provided since this field is deprecated",
+					"schema": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "starting_nonce",
+					"required": false,
+					"description": "Increased by miner untill it finds a matching result that solves a block.",
+					"schema": {
+						"type": "integer"
+					}
+				}
+			],
+			"result": {
+				"name": "GenerateBlocksResponse",
+				"description": "Block submit status.",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GenerateBlocksResponse"
+				}
+			}
+		},
+		{
+			"name": "get_block_count",
+			"description": "Look up how many blocks are in the longest chain known to the node.",
+			"params": [],
+			"result": {
+				"name": "GetBlockCountResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GetBlockCountResponse"
+				}
+			}
+		}
+	]
+}
