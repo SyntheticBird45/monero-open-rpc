@@ -204,7 +204,7 @@
 					"minor_version": {
 						"type": "integer",
 						"minimum": 0,
-						"description": "The minor version of the moneor protocol at this block height."
+						"description": "The minor version of the monero protocol at this block height."
 					},
 					"nonce": {
 						"type": "integer",
@@ -274,7 +274,7 @@
 					}
 				}
 			},
-			"GetBlockHeaderByHashResponse": {
+			"GetBlockHeaderByResponse": {
 				"type": "object",
 				"properties": {
 					"block_header": {
@@ -284,6 +284,174 @@
 					"status": {
 						"type": "string",
 						"description": " General RPC error code. \"OK\" means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					}
+				}
+			},
+			"GetBlockHeadersRangeResponse": {
+				"type": "object",
+				"properties": {
+					"credits": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "If payment for RPC is enabled, the number of credits available to the requesting client. Otherwise, 0."
+					},
+					"headers": {
+						"type": "array",
+						"description": "array of `block_header` (a structure containing block header information. See `get_last_block_header`).",
+						"items": {
+							"$ref": "#/components/schemas/BlockHeader"
+						}
+					},
+					"status": {
+						"type": "string",
+						"description": " General RPC error code. \"OK\" means everything looks good."
+					},
+					"top_hash": {
+						"type": "string",
+						"description": "If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, empty. (Warning, payment for RPC is deprecated)"
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					}
+				}
+			},
+			"BlockDetails": {
+				"type": "object",
+				"properties": {
+					"major_version": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The major version of the monero protocol at this block height."
+					},
+					"minor_version": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The minor version of the monero protocol at this block height."
+					},
+					"timestamp": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The unix time at which the block was recorded into the blockchain."
+					},
+					"prev_id": {
+						"type": "string",
+						"description": "The hash of the block immediately preceding this block in the chain."
+					},
+					"nonce": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "A cryptographic random one-time number used in mining a Monero block"
+					},
+					"miner_tx": {
+						"type": "object",
+						"description": "Miner transaction information",
+						"properties": {
+							"version": {
+								"type": "integer",
+								"description": "Transaction version number."
+							},
+							"unlock_time": {
+								"type": "integer",
+								"description": "The block height when the coinbase transaction becomes spendable."
+							},
+							"vin": {
+								"type": "array",
+								"description": "List of transaction inputs.",
+								"items": {
+									"type": "object",
+									"properties": {
+										"gen": {
+											"type": "object",
+											"description": "Miner txs are coinbase txs, or \"gen\".",
+											"properties": {
+												"height": {
+													"type": "integer",
+													"minimum": 0,
+													"description": "This block height, a.k.a. when the coinbase is generated."
+												}
+											}
+										}
+									}
+								}
+							},
+							"vout": {
+								"type": "array",
+								"description": "List of transaction outputs.",
+								"items": {
+									"type": "object",
+									"properties": {
+										"target": {
+											"type": "object",
+											"properties": {
+												"tagged_key": {
+													"type": "object",
+													"properties": {
+														"key": {
+															"type": "string",
+															"description": "The public key of the output"
+														},
+														"view_tag": {
+															"type": "string",
+															"description": "The 1st byte of a shared secret in hex string (used for reducing synchronization time)"
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							},
+							"extra": {
+								"type": "string",
+								"description": "Usually called the \"transaction ID\" but can be used to include any random 32 byte/64 character hex string."
+							},
+							"rct_signatures": {
+								"type": "string",
+								"description": "Contain signatures of tx signers. Coinbased txs do not have signatures."
+							}		
+						}
+					},
+					"tx_hashes": {
+						"type": "array",
+						"description": "List of hashes of non-coinbase transactions in the block. If there are no other transactions, this will be an empty list.",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"GetBlockResponse": {
+				"type": "object",
+				"properties": {
+					"blob": {
+						"type": "string",
+						"description": "Hexadecimal blob of block information."
+					},
+					"block_header": {
+						"type": "object",
+						"$ref": "#/components/schemas/BlockHeader"
+					},
+					"credits": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "If payment for RPC is enabled, the number of credits available to the requesting client. Otherwise, 0."
+					},
+					"json": {
+						"type": "string",
+						"description": "JSON formatted block details, see `BlockDetails` component"
+					},
+					"status": {
+						"type": "string",
+						"description": " General RPC error code. \"OK\" means everything looks good."
+					},
+					"top_hash": {
+						"type": "string",
+						"description": "If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, empty. (Warning, payment for RPC is deprecated)"
 					},
 					"untrusted": {
 						"type": "boolean",
@@ -517,10 +685,117 @@
 				}
 			],
 			"result": {
-				"name": "GetBlockHeaderByHashResponse",
+				"name": "GetBlockHeaderByResponse",
 				"schema": {
 					"type": "object",
-					"$ref": "#/components/schemas/GetBlockHeaderByHashResponse"
+					"$ref": "#/components/schemas/GetBlockHeaderByResponse"
+				}
+			}
+		},
+		{
+			"name": "get_block_header_by_height",
+			"description": "Similar to `get_block_header_by_hash`, this method includes a block's height as an input parameter to retrieve basic information about the block.",
+			"params": [
+				{
+					"name": "height",
+					"required": true,
+					"description": "The block's height.",
+					"schema": {
+						"type": "integer",
+						"minimum": 0
+					}
+				},
+				{
+					"name": "fill_pow_hash",
+					"required": false,
+					"description": "(Optional; defaults to `false`) Add PoW hash to block_header response.",
+					"schema": {
+						"type": "boolean"
+					}
+				}
+			],
+			"result": {
+				"name": "GetBlockHeaderByResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GetBlockHeaderByResponse"
+				}
+			}
+		},
+		{
+			"name": "get_block_headers_range",
+			"description": "Similar to `get_block_header_by_height`, but for a range of blocks. This method includes a starting block height and an ending block height as parameters to retrieve basic information about the range of blocks.",
+			"params": [
+				{
+					"name": "start_height",
+					"required": true,
+					"description": "The starting block's height.",
+					"schema": {
+						"type": "integer",
+						"minimum": 0
+					}
+				},
+				{
+					"name": "end_height",
+					"required": true,
+					"description": "The ending block's height.",
+					"schema": {
+						"type": "integer",
+						"minimum": 0
+					}
+				},
+				{
+					"name": "fill_pow_hash",
+					"required": false,
+					"description": "(Optional; defaults to `false`) Add PoW hash to block_header response.",
+					"schema": {
+						"type": "boolean"
+					}
+				}
+			],
+			"result": {
+				"name": "GetBlockHeadersRangeResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GetBlockHeadersRangeResponse"
+				}
+			}
+		},
+		{
+			"name": "get_block",
+			"description": "Full block information can be retrieved by either block height or hash, like with the above block header calls. For full block information, both lookups use the same method, but with different input parameters.",
+			"params": [
+				{
+					"name": "height",
+					"required": false,
+					"description": "The block's height. If not defined, `hash` field must be defined",
+					"schema": {
+						"type": "integer",
+						"minimum": 0
+					}
+				},
+				{
+					"name": "end_height",
+					"required": false,
+					"description": "The block's hash. If not defined, `height` field must be defined",
+					"schema": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "fill_pow_hash",
+					"required": false,
+					"description": "(Optional; defaults to `false`) Add PoW hash to block_header response.",
+					"schema": {
+						"type": "boolean"
+					}
+				}
+			],
+			"result": {
+				"name": "GetBlockResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GetBlockResponse"
 				}
 			}
 		}
