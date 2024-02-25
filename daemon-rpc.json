@@ -1185,6 +1185,50 @@
 					"$ref": "#/components/schemas/HardForkInfoResponse"
 				}
 			}
+		},
+		{
+			"name": "set_bans",
+			"description": "Ban another node by IP.",
+			"params": [
+				{
+					"name":"bans",
+					"required": true,
+					"description": "A list of nodes to ban.",
+					"schema": {
+						"type": "array",
+						"items": {
+							"type":"object",
+							"properties": {
+								"host": {
+									"type":"string",
+									"description": "Host to ban (IP in A.B.C.D form - will support I2P address in the future)."
+								},
+								"ip": {
+									"type": "integer",
+									"minimum": 0,
+									"description": "IP address to ban, in Int format."
+								},
+								"ban": {
+									"type": "boolean",
+									"description": "Set `true` to ban."
+								},
+								"seconds": {
+									"type": "integer",
+									"minimum": 0,
+									"description": "Number of seconds to ban node"
+								}
+							}
+						}
+					}
+				}
+			],
+			"result": {
+				"name": "status",
+				"schema": {
+					"type": "string",
+					"description": "General RPC error code. \"OK\" means everything looks good."
+				}
+			}
 		}
 	]
 }
