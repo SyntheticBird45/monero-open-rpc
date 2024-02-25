@@ -22,20 +22,6 @@
 	],
 	"components": {
 		"schemas": {
-			"GetInfoResponse": {
-				"type": "object",
-				"properties": {
-					"blockchainHeight": {
-						"type": "integer",
-						"description": "The current height of the blockchain."
-					},
-					"topBlockHash": {
-						"type": "string",
-						"format": "hex",
-						"description": "The hash of the top block in the blockchain."
-					}
-				}
-			},
 			"GetBlockCountResponse": {
 				"type": "object",
 				"properties": {
@@ -458,6 +444,316 @@
 						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
 					}
 				}
+			},
+			"ConnectionInfo": {
+				"type": "object",
+				"properties": {
+					"address": {
+						"type": "string",
+						"description": "The peer's address, actually IPv4 & port."
+					},
+					"avg_download": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Average bytes of data uploaded by node."
+					},
+					"connection_id": {
+						"type": "string",
+						"description": "The connection ID"
+					},
+					"current_download": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Current bytes downloaded by node."
+					},
+					"current_upload": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Current bytes uploaded by node."
+					},
+					"height": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The peer height"
+					},
+					"host": {
+						"type": "string",
+						"description": "The peer host"
+					},
+					"incoming": {
+						"type": "boolean",
+						"description": "Is the node getting information from your node?"
+					},
+					"ip": {
+						"type": "string",
+						"description": "The node's IP address"
+					},
+					"live_time": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The time elapsed from now to the connection with this peer"
+					},
+					"local_ip": {
+						"type": "boolean",
+						"description": "`true` if part of the node's local network, `false` otherwise"
+					},
+					"localhost": {
+						"type": "boolean",
+						"description": "`true` if localhost, `false` otherwise"
+					},
+					"peer_id": {
+						"type": "string",
+						"description": "The node's ID on the network."
+					},
+					"port": {
+						"type": "string",
+						"description": "The port that the node is using to connect to the network."
+					},
+					"recv_count": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "No description has been provided"
+					},
+					"recv_idle_time": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "No description has been provided"
+					},
+					"send_count": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "No description has been provided"
+					},
+					"send_idle_time": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "No description has been provided"
+					},
+					"state": {
+						"type": "string",
+						"description": "No description has been provided"
+					},
+					"support_flags": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "No description has been provided"
+					}
+				}
+			},
+			"GetConnectionsResponse": {
+				"type": "object",
+				"properties": {
+					"connections": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ConnectionInfo"
+						}
+					},
+					"status": {
+						"type": "string",
+						"description": " General RPC error code. \"OK\" means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					}
+				}
+			},
+			"GetInfoResponse": {
+				"type": "object",
+				"properties": {
+					"adjusted_time": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Current time approximated from chain data, as Unix time."
+					},
+					"alt_blocks_count": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Number of alternative blocks to main chain."
+					},
+					"block_size_limit": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Backward compatibility, same as `block_weight_limit`, use that instead"
+					},
+					"block_size_median": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Backward compatibility, same as `block_weight_median`, use that instead"
+					},
+					"block_weight_limit": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Maximum allowed adjusted block size based on latest 100000 blocks"
+					},
+					"block_weight_median": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Median adjusted block size of latest 100000 blocks"
+					},
+					"bootstrap_daemon_address": {
+						"type": "string",
+						"description": "[Bootstrap node](https://www.getmonero.org/resources/moneropedia/bootstrap-node.html) to give immediate usability to wallets while syncing by proxying RPC to it. (Note: the replies may be untrustworthy)."
+					},
+					"busy_syncing": {
+						"type": "boolean",
+						"description": "States if new blocks are being added (`true`) or not (`false`)."
+					},
+					"credits": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "If payment for RPC is enabled, the number of credits available to the requesting client. Otherwise, 0."
+					},
+					"cumulative_difficulty": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Least-significant 64 bits of the cumulative difficulty of all blocks up to the block in the reply."
+					},
+					"cumulative_difficulty_top64": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Most-significant 64 bits of the 128-bit cumulative difficulty."
+					},
+					"database_size": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The size of the blockchain database, in bytes."
+					},
+					"difficulty": {
+						"type": "integer",
+						"description": "Least-significant 64 bits of the 128-bit network difficulty."
+					},
+					"difficulty_top64": {
+						"type": "integer",
+						"description": "Most-significant 64 bits of the 128-bit network difficulty."
+					},
+					"free_space": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Available disk space on the node. (0 if RPC is restricted)"
+					},
+					"grey_peerlist_size": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Grey Peerlist Size"
+					},
+					"height": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Current length of longest chain known to daemon."
+					},
+					"height_without_bootstrap": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Current length of the local chain of the daemon."
+					},
+					"incoming_connections_count": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Number of peers connected to and pulling from your node."
+					},
+					"mainnet": {
+						"type": "boolean",
+						"description": "States if the node is on the mainnet (`true`), or not (`false`)."
+					},
+					"nettype": {
+						"type": "string",
+						"descritpion":"Network type (one of `mainnet`, `stagenet` or `testnet`)"
+					},
+					"offline": {
+						"type": "boolean",
+						"description": "States if the node is offline (`true`) or online (`false`)."
+					},
+					"outgoing_connections_count": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Number of peers that you are connected to and getting information from."
+					},
+					"rpc_connections_count": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Number of RPC client connected to the daemon (Including this RPC request)."
+					},
+					"stagenet": {
+						"type": "boolean",
+						"description": "States if the node is on the stagenet (`true`), or not (`false`)."
+					},
+					"start_time": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Start time of the daemon, as UNIX time."
+					},
+					"status": {
+						"type": "string",
+						"description": "General RPC error code. \"OK\" means everything looks good."
+					},
+					"synchronized": {
+						"type": "boolean",
+						"description": "States if the node is synchronized (`true`) or not (`false`)."
+					},
+					"target": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Current target for next proof of work."
+					},
+					"target_height": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The height of the next block in the chain."
+					},
+					"testnet": {
+						"type": "boolean",
+						"description": "States if the node is on the testnet (`true`), or not (`false`)."
+					},
+					"top_block_hash": {
+						"type": "string",
+						"description": "Hash of the highest block in the chain."
+					},
+					"top_hash": {
+						"type": "string",
+						"description": "If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, empty. (Warning, payment for RPC is deprecated)"
+					},
+					"tx_count": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Total number of non-coinbase transaction in the chain."
+					},
+					"tx_pool_size": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Number of transactions that have been broadcast but not included in a block."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					},
+					"update_available": {
+						"type": "boolean",
+						"description": "States if a newer Monero software version is available."
+					},
+					"version": {
+						"type": "string",
+						"description": "The version of the Monero software the node is running."
+					},
+					"was_bootstrap_ever_used": {
+						"type": "boolean",
+						"descripion":  "States if a bootstrap node has ever been used since the daemon started."
+					},
+					"white_peerlist_size": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "White Peerlist Size"
+					},
+					"wide_cumulative_difficulty": {
+						"type": "string",
+						"description": "Cumulative difficulty of all blocks in the blockchain as a hexadecimal string representing a 128-bit number."
+					},
+					"wide_difficulty": {
+						"type": "string",
+						"description": "Network difficulty (analogous to the strength of the network) as a hexadecimal string representing a 128-bit number."
+					}
+				}
 			}
 		}
 	},
@@ -796,6 +1092,30 @@
 				"schema": {
 					"type": "object",
 					"$ref": "#/components/schemas/GetBlockResponse"
+				}
+			}
+		},
+		{
+			"name": "get_connections",
+			"description": "Retrieve information about incoming and outgoing connections to your node. (Warning: This method is unavailable if the node have set restricted RPC)",
+			"params": [],
+			"result": {
+				"name": "GetConnectionsResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GetConnectionsResponse"
+				}
+			}
+		},
+		{
+			"name": "get_info",
+			"description": "Retrieve general information about the state of your node and the network.",
+			"params": [],
+			"result": {
+				"name": "GetInfoResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GetInfoResponse"
 				}
 			}
 		}
