@@ -754,6 +754,61 @@
 						"description": "Network difficulty (analogous to the strength of the network) as a hexadecimal string representing a 128-bit number."
 					}
 				}
+			},
+			"HardForkInfoResponse": {
+				"type": "object",
+				"properties": {
+					"credits": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "If payment for RPC is enabled, the number of credits available to the requesting client. Otherwise, 0."
+					},
+					"earliest_height": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Block height at which hard fork would be enabled if voted in."
+					},
+					"enabled": {
+						"type": "boolean",
+						"descripion":  "Tells if hard fork is enforced."
+					},
+					"state": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Current hard fork state: 0 (There is likely a hard fork), 1 (An update is needed to fork properly), or 2 (Everything looks good)."
+					},
+					"status": {
+						"type": "string",
+						"description": "General RPC error code. \"OK\" means everything looks good."
+					},
+					"treshold": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Minimum percent of votes to trigger hard fork. Default is 80."
+					},
+					"top_hash": {
+						"type": "string",
+						"description": "If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, empty."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					},
+					"version": {
+						"type": "string",
+						"description": "The major block version for the fork."
+					},
+					"votes": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Hard fork voting status."
+					},
+					"window": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Number of blocks over which current votes are cast. Default is 10080 blocks."
+					}
+				}
 			}
 		}
 	},
@@ -1116,6 +1171,18 @@
 				"schema": {
 					"type": "object",
 					"$ref": "#/components/schemas/GetInfoResponse"
+				}
+			}
+		},
+		{
+			"name": "hard_fork_info",
+			"description": "Look up information regarding hard fork voting and readiness.",
+			"params": [],
+			"result": {
+				"name": "HardForkInfoResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/HardForkInfoResponse"
 				}
 			}
 		}
