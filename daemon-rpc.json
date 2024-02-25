@@ -15,7 +15,7 @@
 	},
 	"servers": [
 		{
-			"url": "http:\/\/{host}:{port}\/json_rpc",
+			"url": "http:\/\/127.0.0.1:18081\/json_rpc",
 			"name": "Monero daemon address",
 			"summary": "Address of the monero daemon to interact with"
 		}
@@ -1280,6 +1280,7 @@
 		{
 			"name": "banned",
 			"description": "Check if an IP address is banned and for how long.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name":"address",
@@ -1296,13 +1297,13 @@
 				"schema": {
 					"type":"object",
 					"properties": {
-						"status": {
-							"type": "string",
-							"description": "General RPC error code. 'OK' means everything looks good."
-						},
 						"banned": {
 							"type": "boolean",
 							"description": "`true` if banned, `false` otherwise"
+						},
+						"status": {
+							"type": "string",
+							"description": "General RPC error code. 'OK' means everything looks good."
 						},
 						"seconds": {
 							"type": "integer",
@@ -1311,7 +1312,27 @@
 						}
 					}
 				}
-			}
+			},
+			"examples": [
+				{
+					"name": "BannedExample",
+					"description": "Example of checking if an ip address is banned",
+					"params": [
+						{
+							"name": "address",
+							"value": "1.1.1.1"
+						}
+					],
+					"result": {
+						"name": "ExampleIsBanned",
+						"value": {
+							"banned": false,
+							"status": "OK",
+							"seconds": 0
+						}
+					}
+				}
+			]
 		},
 		{
 			"name": "flush_txpool",
