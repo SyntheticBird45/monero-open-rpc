@@ -137,6 +137,159 @@
 						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
 					}
 				}
+			},
+			"BlockHeader": {
+				"type": "object",
+				"description": "A structure containing block header information.",
+				"properties": {
+					"block_size": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Backward compatibility, same as `block_weight`, use that instead",
+						"deprecated": true
+					},
+					"block_weight": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The adjusted block size, in bytes. This is the raw size, plus a positive adjustment for any Bulletproof transactions with more than 2 outputs."
+					},
+					"cumulative_difficulty": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Least-significant 64 bits of the cumulative difficulty of all blocks up to the block in the reply."
+					},
+					"cumulative_difficulty_top64": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Most-significant 64 bits of the 128-bit cumulative difficulty."
+					},
+					"depth": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The number of blocks succeeding this block on the blockchain. A larger number means an older block."
+					},
+					"difficulty": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The strength of the Monero network based on mining power."
+					},
+					"difficulty_top64": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Most-significant 64 bits of the 128-bit network difficulty."
+					},
+					"hash": {
+						"type": "string",
+						"description": "The hash of this block."
+					},
+					"height": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The number of blocks preceding this block on the blockchain."
+					},
+					"long_term_weight": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The long term block weight, based on the median weight of the preceding 100000 blocks."
+					},
+					"major_version": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The major version of the monero protocol at this block height."
+					},
+					"miner_tx_hash": {
+						"type": "string",
+						"description": "The hash of this block's coinbase transaction."
+					},
+					"minor_version": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The minor version of the moneor protocol at this block height."
+					},
+					"nonce": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "A cryptographic random one-time number used in mining a Monero block"
+					},
+					"num_txes": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Number of transactions in the block, excluding the coinbase tx."
+					},
+					"orphan_status": {
+						"type": "boolean",
+						"description": "Usually `false`. If `true`, this block is not part of the longest chain."
+					},
+					"pow_hash": {
+						"type": "string",
+						"description": "The hash, as a hexadecimal string, calculated from the block as proof-of-work."
+					},
+					"prev_hash": {
+						"type": "string",
+						"description": "The hash of the block immediately preceding this block in the chain."
+					},
+					"reward": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The amount of new [atomic units](https://www.getmonero.org/resources/moneropedia/atomic-units.html) generated in this block and rewarded to the miner. Note: 1 XMR = 1e12 [atomic units](https://www.getmonero.org/resources/moneropedia/atomic-units.html)"
+					},
+					"timestamp": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "The unix time at which the block was recorded into the blockchain."
+					},
+					"wide_cumulative_difficulty": {
+						"type": "string",
+						"description": "Cumulative difficulty of all blocks in the blockchain as a hexadecimal string representing a 128-bit number."
+					},
+					"wide_difficulty": {
+						"type": "string",
+						"description": "Network difficulty (analogous to the strength of the network) as a hexadecimal string representing a 128-bit number."
+					}
+				}
+			},
+			"GetLastBlockHeaderResponse": {
+				"type": "object",
+				"properties": {
+					"block_header": {
+						"type": "object",
+						"$ref": "#/components/schemas/BlockHeader"
+					},
+					"credits": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "If payment for RPC is enabled, the number of credits available to the requesting client. Otherwise, 0."
+					},
+					"status": {
+						"type": "string",
+						"description": " General RPC error code. \"OK\" means everything looks good."
+					},
+					"top_hash": {
+						"type": "string",
+						"description": "If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, empty. (Warning, payment for RPC is deprecated)"
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					}
+				}
+			},
+			"GetBlockHeaderByHashResponse": {
+				"type": "object",
+				"properties": {
+					"block_header": {
+						"type": "object",
+						"$ref": "#/components/schemas/BlockHeader"
+					},
+					"status": {
+						"type": "string",
+						"description": " General RPC error code. \"OK\" means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					}
+				}
 			}
 		}
 	},
@@ -276,14 +429,98 @@
 			}
 		},
 		{
-			"name": "get_block_count",
-			"description": "Look up how many blocks are in the longest chain known to the node.",
-			"params": [],
+			"name": "generateblocks",
+			"description": "Submit a mined block to the network.",
+			"params": [
+				{
+					"name": "amount_of_blocks",
+					"required": true,
+					"description": "Number of blocks to be generated.",
+					"schema": {
+						"type": "integer"
+					}
+				},
+				{
+					"name": "wallet_address",
+					"required": true,
+					"description": "address to receive the coinbase reward.",
+					"schema": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "prev_block",
+					"required": false,
+					"description": "No description is provided since this field is deprecated",
+					"schema": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "starting_nonce",
+					"required": false,
+					"description": "Increased by miner untill it finds a matching result that solves a block.",
+					"schema": {
+						"type": "integer"
+					}
+				}
+			],
 			"result": {
-				"name": "GetBlockCountResponse",
+				"name": "GenerateBlocksResponse",
+				"description": "Block submit status.",
 				"schema": {
 					"type": "object",
-					"$ref": "#/components/schemas/GetBlockCountResponse"
+					"$ref": "#/components/schemas/GenerateBlocksResponse"
+				}
+			}
+		},
+		{
+			"name": "get_last_block_header",
+			"description": "Block header information for the most recent block is easily retrieved with this method. No inputs are needed.",
+			"params": [
+				{
+					"name": "fill_pow_hash",
+					"required": false,
+					"description": "(Optional; defaults to `false`) Add PoW hash to block_header response.",
+					"schema": {
+						"type": "boolean"
+					}
+				}
+			],
+			"result": {
+				"name": "GetLastBlockHeaderResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GetLastBlockHeaderResponse"
+				}
+			}
+		},
+		{
+			"name": "get_block_header_by_hash",
+			"description": "Block header information can be retrieved using either a block's hash or height. This method includes a block's hash as an input parameter to retrieve basic information about the block.",
+			"params": [
+				{
+					"name": "hash",
+					"required": true,
+					"description": "The block's sha256 hash.",
+					"schema": {
+						"type": "string"
+					}
+				},
+				{
+					"name": "fill_pow_hash",
+					"required": false,
+					"description": "(Optional; defaults to `false`) Add PoW hash to block_header response.",
+					"schema": {
+						"type": "boolean"
+					}
+				}
+			],
+			"result": {
+				"name": "GetBlockHeaderByHashResponse",
+				"schema": {
+					"type": "object",
+					"$ref": "#/components/schemas/GetBlockHeaderByHashResponse"
 				}
 			}
 		}
