@@ -809,6 +809,41 @@
 						"description": "Number of blocks over which current votes are cast. Default is 10080 blocks."
 					}
 				}
+			},
+			"GetBansResponse": {
+				"type":"object",
+				"properties": {
+					"bans": {
+						"type": "array",
+						"items": {
+							"type":"object",
+							"properties": {
+								"host": {
+									"type":"string",
+									"description": "Host to ban (IP in A.B.C.D form - will support I2P address in the future)."
+								},
+								"ip": {
+									"type": "integer",
+									"minimum": 0,
+									"description": "IP address to ban, in Int format."
+								},
+								"seconds": {
+									"type": "integer",
+									"minimum": 0,
+									"description": "Number of seconds to ban node"
+								}
+							}
+						}
+					},
+					"status": {
+						"type": "string",
+						"description": " General RPC error code. \"OK\" means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					}
+				}
 			}
 		}
 	},
@@ -1227,6 +1262,78 @@
 				"schema": {
 					"type": "string",
 					"description": "General RPC error code. \"OK\" means everything looks good."
+				}
+			}
+		},
+		{
+			"name": "get_bans",
+			"description": "Get list of banned IPs.",
+			"params": [],
+			"result": {
+				"name":"bans",
+				"description": "List of banned nodes",
+				"schema": {
+					"$ref": "#/components/schemas/GetBansResponse"
+				}
+			}
+		},
+		{
+			"name": "banned",
+			"description": "Check if an IP address is banned and for how long.",
+			"params": [
+				{
+					"name":"address",
+					"required": true,
+					"description":"IP address to check in string format.",
+					"schema": {
+						"type":"string"
+					}
+				}
+			],
+			"result": {
+				"name":"bans",
+				"description": "List of banned nodes",
+				"schema": {
+					"type":"object",
+					"properties": {
+						"status": {
+							"type": "string",
+							"description": "General RPC error code. 'OK' means everything looks good."
+						},
+						"banned": {
+							"type": "boolean",
+							"description": "`true` if banned, `false` otherwise"
+						},
+						"seconds": {
+							"type": "integer",
+							"minimum": 0,
+							"description": "No description has been provided"
+						}
+					}
+				}
+			}
+		},
+		{
+			"name": "flush_txpool",
+			"description": "Flush tx ids from transaction pool",
+			"params": [
+				{
+					"name":"txids",
+					"required": false,
+					"description":"Optional, list of transactions IDs to flush from pool (all tx ids flushed if empty).",
+					"schema": {
+						"type":"array",
+						"items": {
+							"type":"string"
+						}
+					}
+				}
+			],
+			"result": {
+				"name":"status",
+				"description": "General RPC error code. 'OK' means everything looks good.",
+				"schema": {
+					"type": "string"
 				}
 			}
 		}
