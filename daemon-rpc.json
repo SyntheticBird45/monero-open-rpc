@@ -15,7 +15,7 @@
 	},
 	"servers": [
 		{
-			"url": "http:\/\/127.0.0.1:18081\/json_rpc",
+			"url": "http://127.0.0.1:18081/json_rpc",
 			"name": "Monero daemon address",
 			"summary": "Address of the monero daemon to interact with"
 		}
@@ -851,6 +851,7 @@
 		{
 			"name": "get_block_count",
 			"description": "Look up how many blocks are in the longest chain known to the node.",
+			"paramStructure":"by-name",
 			"params": [],
 			"result": {
 				"name": "GetBlockCountResponse",
@@ -863,6 +864,7 @@
 		{
 			"name": "on_get_block_hash",
 			"description": "Look up a block's hash by its height.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name": "block height",
@@ -886,6 +888,7 @@
 		{
 			"name": "get_block_template",
 			"description": "Get a block template on which mining a new block.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name": "wallet_address",
@@ -915,6 +918,7 @@
 		{
 			"name": "submit_block",
 			"description": "Submit a mined block to the network.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name": "Block blob data",
@@ -939,6 +943,7 @@
 		{
 			"name": "generateblocks",
 			"description": "Submit a mined block to the network.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name": "amount_of_blocks",
@@ -985,6 +990,7 @@
 		{
 			"name": "generateblocks",
 			"description": "Submit a mined block to the network.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name": "amount_of_blocks",
@@ -1031,6 +1037,7 @@
 		{
 			"name": "get_last_block_header",
 			"description": "Block header information for the most recent block is easily retrieved with this method. No inputs are needed.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name": "fill_pow_hash",
@@ -1052,6 +1059,7 @@
 		{
 			"name": "get_block_header_by_hash",
 			"description": "Block header information can be retrieved using either a block's hash or height. This method includes a block's hash as an input parameter to retrieve basic information about the block.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name": "hash",
@@ -1081,6 +1089,7 @@
 		{
 			"name": "get_block_header_by_height",
 			"description": "Similar to `get_block_header_by_hash`, this method includes a block's height as an input parameter to retrieve basic information about the block.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name": "height",
@@ -1111,6 +1120,7 @@
 		{
 			"name": "get_block_headers_range",
 			"description": "Similar to `get_block_header_by_height`, but for a range of blocks. This method includes a starting block height and an ending block height as parameters to retrieve basic information about the range of blocks.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name": "start_height",
@@ -1150,6 +1160,7 @@
 		{
 			"name": "get_block",
 			"description": "Full block information can be retrieved by either block height or hash, like with the above block header calls. For full block information, both lookups use the same method, but with different input parameters.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name": "height",
@@ -1188,6 +1199,7 @@
 		{
 			"name": "get_connections",
 			"description": "Retrieve information about incoming and outgoing connections to your node. (Warning: This method is unavailable if the node have set restricted RPC)",
+			"paramStructure":"by-name",
 			"params": [],
 			"result": {
 				"name": "GetConnectionsResponse",
@@ -1200,6 +1212,7 @@
 		{
 			"name": "get_info",
 			"description": "Retrieve general information about the state of your node and the network.",
+			"paramStructure":"by-name",
 			"params": [],
 			"result": {
 				"name": "GetInfoResponse",
@@ -1212,6 +1225,7 @@
 		{
 			"name": "hard_fork_info",
 			"description": "Look up information regarding hard fork voting and readiness.",
+			"paramStructure":"by-name",
 			"params": [],
 			"result": {
 				"name": "HardForkInfoResponse",
@@ -1224,6 +1238,7 @@
 		{
 			"name": "set_bans",
 			"description": "Ban another node by IP.",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name":"bans",
@@ -1260,14 +1275,76 @@
 			"result": {
 				"name": "status",
 				"schema": {
-					"type": "string",
-					"description": "General RPC error code. \"OK\" means everything looks good."
+					"type": "object",
+					"properties": {
+						"status": {
+							"type": "string",
+							"description": "General RPC error code. \"OK\" means everything looks good."
+						},
+						"untrusted": {
+							"type": "boolean",
+							"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (true), or when the daemon is fully synced and thus handles the RPC locally (false)"
+						}
+					}
 				}
-			}
+			},
+			"examples": [
+				{
+					"name": "banning by host",
+					"description": "In the following example, host is banned with its IP address string-formatted as A.B.C.D:",
+					"params": [
+						{
+							"name":"host",
+							"value": "192.168.1.51"
+						},
+						{
+							"name": "ban",
+							"value": true
+						},
+						{
+							"name": "seconds",
+							"value": 30
+						}
+					],
+					"result": {
+						"name": "ResultExample",
+						"value": {
+							"status": "OK",
+							"untrusted": false
+						}
+					}
+				},
+				{
+					"name": "banning by ip",
+					"description": "In the following example, integer-formatted IP is banned:",
+					"params": [
+						{
+							"name":"ip",
+							"value": 838969536
+						},
+						{
+							"name": "ban",
+							"value": true
+						},
+						{
+							"name": "seconds",
+							"value": 30
+						}
+					],
+					"result": {
+						"name": "ResultExample",
+						"value": {
+							"status": "OK",
+							"untrusted": false
+						}
+					}
+				}			  
+			]
 		},
 		{
 			"name": "get_bans",
 			"description": "Get list of banned IPs.",
+			"paramStructure":"by-name",
 			"params": [],
 			"result": {
 				"name":"bans",
@@ -1275,7 +1352,32 @@
 				"schema": {
 					"$ref": "#/components/schemas/GetBansResponse"
 				}
-			}
+			},
+			"examples": [
+				{
+					"name": "Example",
+					"params": [],
+					"result": {
+						"name": "ResultExample",
+						"value": {
+							"bans": [
+								{
+									"host": "102.168.1.51",
+									"ip": 855746662,
+									"seconds": 22
+							  	},
+								{
+									"host": "192.168.1.50",
+									"ip": 838969536,
+									"seconds": 28
+							  	}
+							],
+							"status": "OK",
+							"untrusted": false
+						}
+					}
+				}				  
+			]
 		},
 		{
 			"name": "banned",
@@ -1315,8 +1417,8 @@
 			},
 			"examples": [
 				{
-					"name": "BannedExample",
-					"description": "Example of checking if an ip address is banned",
+					"name": "Banned example",
+					"description": "Check if 1.1.1.1 is banned and for how long.",
 					"params": [
 						{
 							"name": "address",
@@ -1337,6 +1439,7 @@
 		{
 			"name": "flush_txpool",
 			"description": "Flush tx ids from transaction pool",
+			"paramStructure":"by-name",
 			"params": [
 				{
 					"name":"txids",
@@ -1356,7 +1459,28 @@
 				"schema": {
 					"type": "string"
 				}
-			}
+			},
+			"examples": [
+				{
+					"name":"Example",
+					"description":"Example of flushing the txpool from tx with id \"dc16fa8eaffe1484ca9014ea050e13131d3acf23b419f33bb4cc0b32b6c49308\"",
+					"params": [
+						{
+							"name":"txids",
+							"value": [
+								"dc16fa8eaffe1484ca9014ea050e13131d3acf23b419f33bb4cc0b32b6c49308",
+								""
+							]
+						}
+					],
+					"result": {
+						"name":"ResultExample",
+						"value": {
+							"status": "OK"
+						}
+					}
+				}
+			]
 		}
 	]
 }
