@@ -21,6 +21,20 @@
 		}
 	],
 	"components": {
+		"tags": {
+			"unrestricted": {
+				"name":"Unrestricted",
+				"description":"If the monero daemon have been setup to restrict its RPC endpoints, this method will still be available."
+			},
+			"obfuscated": {
+				"name":"Obfuscated",
+				"description":"If the monero daemon have been setup to restrict its RPC endpoints, this method will still be available but will obfuscate some of its fields. This often happen when a method is necessary for the network to operate but does include by default dangerous informations for the node. Obfuscated fields are often empty strings or integers set to 0."
+			},
+			"restricted": {
+				"name":"Restricted",
+				"description":"If the monero daemon have been setup to restrict its RPC endpoints, this method will not be available and will return a `method not found` error."
+			}
+		},
 		"schemas": {
 			"GetBlockCountResponse": {
 				"type": "object",
@@ -844,9 +858,227 @@
 						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
 					}
 				}
+			},
+			"GetOutputHistogramResponse": {
+				"type":"object",
+				"properties": {
+					"credits": {
+						"type":"integer",
+						"minimum":0,
+						"description":"If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, 0."
+					},
+					"histogram": {
+						"type":"array",
+						"items": {
+							"type":"object",
+							"properties": {
+								"amount": {
+									"type":"integer",
+									"minimum":0,
+									"description": "Output amount in atomic units"
+								},
+								"total_instances": {
+									"type":"integer",
+									"minimum": 0
+								},
+								"unlocked_instances": {
+									"type":"integer",
+									"minimum": 0
+								},
+								"recent_instances": {
+									"type":"integer",
+									"minimum": 0
+								}
+							}
+						}
+					},
+					"status": {
+						"type": "string",
+						"description": " General RPC error code. \"OK\" means everything looks good."
+					},
+					"top_hash": {
+						"type": "string",
+						"deprecated":true,
+						"description": "If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, empty. (Warning, payment for RPC is deprecated)"
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					}
+				}
+			},
+			"GetOutputCoinbaseResponse": {
+				"type":"object",
+				"properties": {
+					"credits": {
+						"type":"integer",
+						"minimum":0,
+						"description":"If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, 0."
+					},
+					"emission_amount": {
+						"type":"integer",
+						"minimum":0,
+						"description":"Least significant 64 bits for 128 bit integer representing the sum of coinbase rewards in atomic units."
+					},
+					"emission_amount_top64": {
+						"type":"integer",
+						"minimum":0,
+						"description":"Most significant 64 bits for 128 bit integer representing the sum of coinbase rewards in atomic units"
+					},
+					"fee_amount": {
+						"type":"integer",
+						"minimum":0,
+						"description":"Least significant 64 bits for 128 bit integer representing the sum of fees in atomic units"
+					},
+					"fee_amount_top64": {
+						"type":"integer",
+						"minimum":0,
+						"description":"Most significant 64 bits for 128 bit integer representing the sum of fees in atomic units"
+					},
+					"status": {
+						"type": "string",
+						"description": " General RPC error code. \"OK\" means everything looks good."
+					},
+					"top_hash": {
+						"type": "string",
+						"deprecated":true,
+						"description": "If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, empty. (Warning, payment for RPC is deprecated)"
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					},
+					"wide_emission_amount": {
+						"type": "string",
+						"description": "string (128 bit hex encoded integer); Sum of coinbase rewards in atomic units"
+					},
+					"wide_fee_amount": {
+						"type": "string",
+						"description": "string (128 bit hex encoded integer); Sum of fees in atomic units"
+					}
+				}
+			},
+			"GetVersionResponse": {
+				"type":"object",
+				"properties": {
+					"current_height": {
+						"type":"integer",
+						"minimum": 0,
+						"description":"Current blockchain's height"
+					},
+					"hard_forks": {
+						"type":"array",
+						"description":"List of network hard forks with their heights",
+						"items":{
+							"type":"object",
+							"properties": {
+								"height": {
+									"type":"integer",
+									"description":"Height at which the hard fork is enabled by consensus",
+									"minimum":0
+								},
+								"hf_version": {
+									"type":"integer",
+									"description":"Version of the hard fork",
+									"minimum":0
+								}
+							}
+						}
+					},
+					"release": {
+						"type":"boolean",
+						"description":"States if the daemon software version corresponds to an official tagged release (`true`), or not (`false`)"
+					},
+					"status": {
+						"type":"string",
+						"description":"General RPC error code. \"OK\" means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description":"States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					},
+					"version": {
+						"type":"integer",
+						"description":"Indicate the version of the core RPC module. It is defined as follow: `((major)<<16)|(minor)`",
+						"minimum":0
+					}
+				}
+			},
+			"GetFeeEstimateResponse": {
+				"type":"object",
+				"properties": {
+					"credits": {
+						"type":"integer",
+						"minimum":0,
+						"description":"If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, 0."
+					},
+					"fee": {
+						"type":"integer",
+						"minimum": 0,
+						"description":"Amount of fees estimated per byte in atomic units"
+					},
+					"fees": {
+						"type":"array",
+						"description":"Represents the base fees at different priorities [slow, normal, fast, fastest].",
+						"items": {
+							"type":"integer",
+							"minimum": 0
+						}
+					},
+					"quantization_mask": {
+						"type":"integer",
+						"description":"Final fee should be rounded up to an even multiple of this value",
+						"minimum": 0
+					},
+					"status": {
+						"type":"string",
+						"description":"General RPC error code. \"OK\" means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description":"States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					},
+					"version": {
+						"type":"integer",
+						"description":"Indicate the version of the core RPC module. It is defined as follow: `((major)<<16)|(minor)`",
+						"minimum":0
+					}
+				}
 			}
 		}
 	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	"methods": [
 		{
 			"name": "get_block_count",
@@ -1477,6 +1709,323 @@
 						"name":"ResultExample",
 						"value": {
 							"status": "OK"
+						}
+					}
+				}
+			]
+		},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		{
+			"name": "get_output_histogram",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
+			"description": "Get a histogram of output amounts. For all amounts (possibly filtered by parameters), gives the number of outputs on the chain for that amount. RingCT outputs counts as 0 amount.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"amounts",
+					"required": true,
+					"description":"List of amounts to get entries from",
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				},
+				{
+					"name":"min_count",
+					"required": false,
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				},
+				{
+					"name":"max_count",
+					"required": false,
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				},
+				{
+					"name":"unlocked",
+					"required": false,
+					"schema": {
+						"type":"boolean",
+						"minimum":0
+					}
+				},
+				{
+					"name":"recent_cutoff",
+					"required": false,
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				}
+			],
+			"result": {
+				"name":"GetOutputHistogramResult",
+				"schema": {
+					"$ref": "#/components/schemas/GetOutputHistogramResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Example",
+					"description":"Request an histogram of all outputs with an amount of 20000000000 atomic units",
+					"params": [
+						{
+							"name":"amounts",
+							"value": [20000000000]
+						}
+					],
+					"result": {
+						"name": "ResultExample",
+						"value": {
+							"credits": 0,
+							"histogram": [
+								{
+									"amount": 20000000000,
+									"recent_instances": 0,
+									"total_instances": 381477,
+									"unlocked_instances": 0
+								}
+							],
+							"status": "OK",
+							"top_hash": "",
+							"untrusted": false
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "get_coinbase_tx_sum",
+			"tags": [
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
+			"description": "Get the coinbase amount and the fees amount for n last blocks starting at particular height",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"height",
+					"required": true,
+					"description":"Block height from which getting the amounts",
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				},
+				{
+					"name":"count",
+					"required": true,
+					"description":"Number of blocks to include in the sum",
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				}
+			],
+			"result": {
+				"name":"GetOutputCoinbaseResult",
+				"schema": {
+					"$ref": "#/components/schemas/GetOutputCoinbaseResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Example",
+					"description":"Request to the node the coinbase transaction sum of height 1563078, including the second last block",
+					"params": [
+						{
+							"name":"height",
+							"value": 1563078
+						},
+						{
+							"name":"count",
+							"value": 2
+						}
+					],
+					"result": {
+						"name": "ResultExample",
+						"value": {
+							"credits": 0,
+    						"emission_amount": 9471836197320,
+    						"emission_amount_top64": 0,
+    						"fee_amount": 0,
+    						"fee_amount_top64": 0,
+    						"status": "OK",
+    						"top_hash": "",
+    						"untrusted": false,
+    						"wide_emission_amount": "0x89d556e91c8",
+    						"wide_fee_amount": "0x0"
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "get_version",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
+			"description": "This method originally served at indicating the version of the monero node. It also now indicate current height and all hard fork's height",
+			"paramStructure":"by-name",
+			"params": [],
+			"result": {
+				"name":"GetVersionResult",
+				"schema": {
+					"$ref": "#/components/schemas/GetVersionResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Monero v0.18.3.1",
+					"description":"Request actual node version, blockchain's height and hard forks informations. (from Monero v0.18.3.1)",
+					"params": [],
+					"result": {
+						"name": "ResultExample",
+						"value": {
+							"current_height": 3093596,
+    						"hard_forks": [{
+    						  "height": 1,
+    						  "hf_version": 1
+    						},
+							{
+    						  "height": 1009827,
+    						  "hf_version": 2
+    						},
+							{
+    						  "height": 1141317,
+    						  "hf_version": 3
+    						},
+							{
+    						  "height": 1220516,
+    						  "hf_version": 4
+    						},
+							{
+    						  "height": 1288616,
+    						  "hf_version": 5
+    						},
+							{
+    						  "height": 1400000,
+    						  "hf_version": 6
+    						},
+							{
+    						  "height": 1546000,
+    						  "hf_version": 7
+    						},
+							{
+    						  "height": 1685555,
+    						  "hf_version": 8
+    						},
+							{
+    						  "height": 1686275,
+    						  "hf_version": 9
+    						},
+							{
+    						  "height": 1788000,
+    						  "hf_version": 10
+    						},
+							{
+    						  "height": 1788720,
+    						  "hf_version": 11
+    						},
+							{
+    						  "height": 1978433,
+    						  "hf_version": 12
+    						},
+							{
+    						  "height": 2210000,
+    						  "hf_version": 13
+    						},
+							{
+    						  "height": 2210720,
+    						  "hf_version": 14
+    						},
+							{
+    						  "height": 2688888,
+    						  "hf_version": 15
+    						},
+							{
+    						  "height": 2689608,
+    						  "hf_version": 16
+    						}],
+    						"release": true,
+    						"status": "OK",
+    						"untrusted": true,
+    						"version": 196621
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "get_fee_estimate",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
+			"description": "Gives an estimation on fees per byte.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"grace_blocks",
+					"description":"No description has been provided",
+					"required":false,
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				}
+			],
+			"result": {
+				"name":"GetFeeEstimateResult",
+				"schema": {
+					"$ref": "#/components/schemas/GetFeeEstimateResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Request fees",
+					"description":"Request the current fee estimates",
+					"params": [],
+					"result": {
+						"name": "ResultExample",
+						"value": {
+							"credits": 0,
+    						"fee": 20000,
+    						"fees": [20000,80000,320000,4000000],
+    						"quantization_mask": 10000,
+    						"status": "OK",
+    						"top_hash": "",
+    						"untrusted": true
 						}
 					}
 				}
