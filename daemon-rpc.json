@@ -28,7 +28,7 @@
 			},
 			"obfuscated": {
 				"name":"Obfuscated",
-				"description":"If the monero daemon have been setup to restrict its RPC endpoints, this method will still be available but will obfuscate some of its fields. This often happen when a method is necessary for the network to operate but does include by default dangerous informations for the node. Obfuscated fields are often empty strings or integers set to 0."
+				"description":"If the monero daemon have been setup to restrict its RPC endpoints, this method will still be available but will obfuscate some of its fields or generally show a different behavior. This often happen when a method is necessary for the network to operate but does include by default dangerous informations for the node. Obfuscated fields are often empty strings or integers set to 0. Some methods can also just return an error based solely on the parameters"
 			},
 			"restricted": {
 				"name":"Restricted",
@@ -1257,6 +1257,42 @@
 						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`). Note: This field always return false since the `sync_info` never call the bootstrap daemon"
 					}
 				}
+			},
+			"GetOutputDistributionResponse": {
+				"type":"object",
+				"properties": {
+					"distributions": {
+						"type":"array",
+						"items": {
+							"type":"object",
+							"properties": {
+								"amount": {
+									"type":"integer",
+									"minimum": 0
+								},
+								"base": {
+									"type":"integer",
+									"minimum": 0
+								},
+								"distribution": {
+									"type":"array",
+									"items": {
+										"type":"integer",
+										"minimum": 0
+									}
+								},
+								"start_height": {
+									"type":"integer",
+									"minimum": 0
+								}
+							}
+						}
+					},
+					"status": {
+						"type":"string",
+						"description":"General RPC error code. \"OK\" means everything looks good."
+					}
+				}
 			}
 		}
 	},
@@ -2472,7 +2508,7 @@
 					"$ref":"#/components/tags/unrestricted"
 				}
 			],
-			"description": "Returns all transaction pool backlog in binary format. **IT ISN'T JSON**",
+			"description": "Returns all transaction pool backlog in binary format. **IT ISN'T VALID JSON**",
 			"paramStructure":"by-name",
 			"params": [],
 			"result": {
@@ -2481,6 +2517,111 @@
 					"$ref": "#/components/schemas/GetTxPoolBackLogResponse"
 				}
 			}
+		},
+		{
+			"name": "get_output_distribution",
+			"tags": [
+				{
+					"$ref":"#/components/tags/obfuscated"
+				}
+			],
+			"description": "Collect informations about an output distribution. Restricted RPC can only get output distribution for RingCT outputs.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"amounts",
+					"required": false,
+					"description":"An array of amounts to look for",
+					"schema": {
+						"type":"array",
+						"items": {
+							"type":"integer",
+							"minimum":0
+						}
+					}
+				},
+				{
+					"name":"cumulative",
+					"required": false,
+					"description":"States if the result should be cumulative (`true`) or not (`false`) (default is `false`)",
+					"schema": {
+						"type":"boolean"
+					}
+				},
+				{
+					"name":"from_height",
+					"required": false,
+					"description":"Starting height to check from (default is 0)",
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				},
+				{
+					"name":"to_height",
+					"required": false,
+					"description":"Ending height to check up to (default is 0)",
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				},
+				{
+					"name":"binary",
+					"required": false,
+					"description":"States if the result should be sent in binary form (using `epee` encoding) (default is `true`)",
+					"schema": {
+						"type":"boolean"
+					}
+				},
+				{
+					"name":"compress",
+					"required": false,
+					"description":"States if the result should be compressed, only useful if the `binary` field is set to `true` (default is `true`)",
+					"schema": {
+						"type":"boolean"
+					}
+				}
+			],
+			"result": {
+				"name":"GetOutputDistributionResult",
+				"schema": {
+					"$ref":"#/components/schemas/GetOutputDistributionResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Amount 628780000",
+					"description":"Example of requesting distribution of the outputs with an amount of 628780000. **WARNING!** the `distribution` field is way bigger than what is presented in the example's result. It is why it can be sent in binary/compressed form",
+					"params": [
+						{
+							"name":"ExampleRequest",
+							"value": {
+								"amounts":[628780000],
+								"from_height":1462078,
+								"binary":false
+							}
+						}
+					],
+					"result": {
+						"name":"DistributionResult",
+						"value": {
+							"credits": 0,
+    						"distributions": [{
+    							"amount": 628780000,
+    							"base": 0,
+    							"binary": false,
+    							"compress": false,
+    							"distribution": [2,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+							}],
+							"start_height": 1462078,
+							"status": "OK",
+    						"top_hash": "",
+    						"untrusted": true
+						}
+					}
+				}
+			]
 		}
 	]
 }
