@@ -1293,6 +1293,72 @@
 						"description":"General RPC error code. \"OK\" means everything looks good."
 					}
 				}
+			},
+			"GetMinerDataResponse": {
+				"type":"object",
+				"properties": {
+					"major_version": {
+						"type":"integer",
+						"minimum":0,
+						"description":"Block's major fork version"
+					},
+					"height": {
+						"type":"integer",
+						"minimum":0,
+						"description":"Block's height"
+					},
+					"prev_id": {
+						"type":"string",
+						"description":"Parent block's hash"
+					},
+					"seed_hash": {
+						"type":"string",
+						"description":"RandomX seed hash"
+					},
+					"difficulty": {
+						"type":"integer",
+						"minimum":0,
+						"description":"Network difficulty"
+					},
+					"median_weight": {
+						"type":"integer",
+						"minimum":0,
+						"description":"Median blocks weight"
+					},
+					"already_generated_coins": {
+						"type":"integer",
+						"minimum":0,
+						"description":"Coins mined by the network so far."
+					},
+					"status": {
+						"type":"string",
+						"description":"General RPC error code. \"OK\" means everything looks good."
+					},
+					"tx_backlog": {
+						"type":"array",
+						"description":"array of mineable mempool transactions.",
+						"items": {
+							"type":"object",
+							"properties":{
+								"id": {
+									"type":"string"
+								},
+								"weight": {
+									"type":"integer",
+									"minimum":0
+								},
+								"fee": {
+									"type":"integer",
+									"minimum":0
+								}
+							}
+						}
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`). Note: This field always return false since the `sync_info` never call the bootstrap daemon"
+					}
+				}
 			}
 		}
 	},
@@ -2618,6 +2684,64 @@
 							"status": "OK",
     						"top_hash": "",
     						"untrusted": true
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "get_miner_data",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
+			"description": "Provide the necessary data to create a custom block template. They are used by p2pool.",
+			"paramStructure":"by-name",
+			"params": [],
+			"result": {
+				"name":"GetMinerDataResult",
+				"schema": {
+					"$ref":"#/components/schemas/GetMinerDataResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Requesting block template",
+					"description":"Example of requesting necessary data for p2pool to operate",
+					"params": [],
+					"result": {
+						"name":"DistributionResult",
+						"value": {
+							"already_generated_coins": 18403687239336866969,
+    						"difficulty": "0x386d6e1a28",
+    						"height": 3094152,
+    						"major_version": 16,
+    						"median_weight": 300000,
+    						"prev_id": "4436dc6bd2421d7ed13df37412f55bafeaf5624f744fe33fe9c8544eff8773a4",
+    						"seed_hash": "3981f50fa207c5e2f9fa45fe104e80dc9e9f7538f4b2a2efccaeb7856cedf616",
+    						"status": "OK",
+    						"tx_backlog": [{
+    						  "fee": 30640000,
+    						  "id": "63beffdc6a17a6c98e7bade9e171636e1d84ae237d31fec01729a9f5d95fd908",
+    						  "weight": 1532
+    						},
+							{
+    						  "fee": 44480000,
+    						  "id": "45d31ab8f18e8b9f4cc7f26de2ec0535baf7e18f9cbecb2a5e7923e887733b28",
+    						  "weight": 2224
+    						},
+							{
+    						  "fee": 72460000,
+    						  "id": "7666f1368ad4e31d84fd898af0d55c010a0d92b280cb1f8347dd4134d62ada39",
+    						  "weight": 3601
+    						},
+							{
+    						  "fee": 30660000,
+    						  "id": "fd5dd1a5c04c0982394452ac57bfbd84379c88447af1fa7b08104597c0fa2d81",
+    						  "weight": 1533
+    						}],
+    						"untrusted": false
 						}
 					}
 				}
