@@ -464,9 +464,19 @@
 				"properties": {
 					"address": {
 						"type": "string",
-						"description": "The peer's address, actually IPv4 & port."
+						"description": "The peer's address, actually IPv4|IPv6 & port."
+					},
+					"address_type": {
+						"type":"integer",
+						"minimum": 0,
+						"description": "The peer's address type. `invalid = 0`, `IPv4 = 1` and `IPv6 = 2`"
 					},
 					"avg_download": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "Average bytes of data downloaded by node."
+					},
+					"avg_upload": {
 						"type": "integer",
 						"minimum": 0,
 						"description": "Average bytes of data uploaded by node."
@@ -529,6 +539,16 @@
 						"description": "No description has been provided"
 					},
 					"recv_idle_time": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "No description has been provided"
+					},
+					"rpc_credits_per_hash": {
+						"type": "integer",
+						"minimum": 0,
+						"description": "No description has been provided"
+					},
+					"rpc_port": {
 						"type": "integer",
 						"minimum": 0,
 						"description": "No description has been provided"
@@ -1042,6 +1062,199 @@
 						"type":"integer",
 						"description":"Indicate the version of the core RPC module. It is defined as follow: `((major)<<16)|(minor)`",
 						"minimum":0
+					}
+				}
+			},
+			"GetAlternateChainsResponse": {
+				"type":"object",
+				"properties": {
+					"chains": {
+						"type":"array",
+						"description":"Array of alternative chain entries",
+						"items": {
+							"type":"object",
+							"description":"An alternative chain information structure",
+							"properties": {
+								"block_hash": {
+									"type":"string",
+									"description":"the block hash of the first diverging block of this alternative chain."
+								},
+								"block_hashes": {
+									"type":"array",
+									"description":"An array of all block hashes in the alternative chain that are not in the main chain.",
+									"items": {
+										"type":"string"
+									}
+								},
+								"difficulty": {
+									"type": "integer",
+									"minimum": 0,
+									"description": "Least-significant 64 bits of 128-bit integer for the cumulative difficulty of all blocks in the alternative chain."
+								},
+								"difficulty_top64": {
+									"type": "integer",
+									"minimum": 0,
+									"description": "Most-significant 64 bits of 128-bit integer for the cumulative difficulty of all blocks in the alternative chain."
+								},
+								"height": {
+									"type":"integer",
+									"minimum": 0,
+									"description":"The block height of the first diverging block of this alternative chain."
+								},
+								"length": {
+									"type":"integer",
+									"minimum": 0,
+									"description":"the length in blocks of this alternative chain, after divergence."
+								},
+								"main_chain_parent_block": {
+									"type":"string",
+									"description":"The hash of the greatest height block that is shared between the alternative chain and the main chain."
+								},
+								"wide_difficulty": {
+									"type":"string",
+									"description":"The hash of the greatest height block that is shared between the alternative chain and the main chain."
+								}
+							}
+						}
+					},
+					"status": {
+						"type":"string",
+						"description":"General RPC error code. \"OK\" means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description":"States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+					}
+				}
+			},
+			"SyncInfoResponse": {
+				"type":"object",
+				"properties": {
+					"credits": {
+						"type":"integer",
+						"minimum":0,
+						"description":"If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, 0."
+					},
+					"height": {
+						"type":"integer",
+						"minimum":0,
+						"description":"Daemon's current height. In bootstrap configuration, this field do not return the bootstrap daemon's height"
+					},
+					"next_needed_pruning_seed": {
+						"type":"integer",
+						"minimum":0,
+						"description":"The next pruning seed needed for pruned sync. This integer is contained between `=0` and the number of pruning strip (as of Monero v0.18.3.1, `8`)"
+					},
+					"overview": {
+						"type":"string",
+						"description": "Overview of current block queue where each character in the string represents a block set in the queue. `. = requested but not received`, `o = set received`, `m  = received set that matches the next blocks needed`"
+					},
+					"peers": {
+						"type":"array",
+						"description":"array of peer structure",
+						"items": {
+							"type":"object",
+							"properties": {
+								"info": {
+									"$ref":"#/components/schemas/ConnectionInfo"
+								}
+							}
+						}
+					},
+					"spans": {
+						"type":"array",
+						"description":"array of span structure",
+						"items": {
+							"type":"object",
+							"properties": {
+								"connection_id": {
+									"type":"string",
+									"description":"Id of connection"
+								},
+								"nblocks": {
+									"type":"integer",
+									"minimum":0,
+									"description":"Number of blocks in that span"
+								},
+								"rate": {
+									"type":"integer",
+									"minimum":0,
+									"description":"Connection rate"
+								},
+								"remote_address": {
+									"type":"string",
+									"description":"peer address the node is downloading (or has downloaded) than span from"
+								},
+								"size": {
+									"type":"integer",
+									"minimum": 0,
+									"description": "Total number of bytes in that span's blocks (including txes)"
+								},
+								"speed": {
+									"tpye":"integer",
+									"minimum": 0,
+									"description": "Connection speed"
+								},
+								"start_block_height": {
+									"type":"integer",
+									"minimum": 0,
+									"description": "Block height of the first block in that span"
+								}
+							}
+						}
+					},
+					"status": {
+						"type":"string",
+						"description":"General RPC error code. \"OK\" means everything looks good."
+					},
+					"target_height": {
+						"type":"integer",
+						"minimum": 0,
+						"description": "Target height the node is aiming for (will be 0 if node is fully synced)"
+					},
+					"top_hash": {
+						"type": "string",
+						"deprecated":true,
+						"description": "If payment for RPC is enabled, the hash of the highest block in the chain. Otherwise, empty. (Warning, payment for RPC is deprecated)"
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`). Note: This field always return false since the `sync_info` never call the bootstrap daemon"
+					}
+				}
+			},
+			"GetTxPoolBackLogResponse": {
+				"type":"object",
+				"description": "This response is sent in binary form. IT IS NOT JSON",
+				"properties": {
+					"backlog": {
+						"type":"array",
+						"description": "array of structures tx_backlog_entry (in binary form)",
+						"items": {
+							"type":"object",
+							"properties": {
+								"blob_size": {
+									"type":"integer",
+									"minimum": 0
+								},
+								"fee": {
+									"type":"integer",
+									"minimum": 0
+								},
+								"time_in_pool": {
+									"type":"integer",
+									"minimum": 0
+								}
+							}
+						}
+					},
+					"status": {
+						"type":"string",
+						"description":"General RPC error code. \"OK\" means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`). Note: This field always return false since the `sync_info` never call the bootstrap daemon"
 					}
 				}
 			}
@@ -2030,6 +2243,244 @@
 					}
 				}
 			]
+		},
+		{
+			"name": "get_alternate_chains",
+			"tags": [
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
+			"description": "Returns all alternative chains seen by the node.",
+			"paramStructure":"by-name",
+			"params": [],
+			"result": {
+				"name":"GetAlternateChainsResult",
+				"schema": {
+					"$ref": "#/components/schemas/GetAlternateChainsResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Get alternatives chains",
+					"description":"This example provide a response containing a subset of alternatives chains seen by a 27 day old monero daemon. The node had seen 35 alternative chains",
+					"params": [],
+					"result": {
+						"name": "SubsetExample",
+						"value": {
+							"chains": [{
+								"block_hash": "eb9d4981d76aa79aec973f48cf208413efd4203d6c43305717bc1f613d580ffc",
+								"block_hashes": ["eb9d4981d76aa79aec973f48cf208413efd4203d6c43305717bc1f613d580ffc"],
+								"difficulty": 336511215954680339,
+								"difficulty_top64": 0,
+								"height": 3084604,
+								"length": 1,
+								"main_chain_parent_block": "9ffea9b494efa4230b99b87a77e8dcd8965e94e429641c019fa5a171d940d0cd",
+								"wide_difficulty": "0x4ab872b01e9da13"
+							  },{
+								"block_hash": "70e5eb1ac35e8c4b53565ec5dd2e8aa20092ed0dc55590aef38fd2af2abf81df",
+								"block_hashes": ["70e5eb1ac35e8c4b53565ec5dd2e8aa20092ed0dc55590aef38fd2af2abf81df"],
+								"difficulty": 335337050449101510,
+								"difficulty_top64": 0,
+								"height": 3080211,
+								"length": 1,
+								"main_chain_parent_block": "d55cad99dfef16f32ca3c5844736587edd9a80fb757788a62817b7f82258c1d4",
+								"wide_difficulty": "0x4a75b454c0bc2c6"
+							  },{
+								"block_hash": "2bc54f02130bf7dc18806cb16c25f16569157f1d8a7d26b4eb70a12f0bad3cdf",
+								"block_hashes": ["2bc54f02130bf7dc18806cb16c25f16569157f1d8a7d26b4eb70a12f0bad3cdf"],
+								"difficulty": 337698982822081011,
+								"difficulty_top64": 0,
+								"height": 3088986,
+								"length": 1,
+								"main_chain_parent_block": "fd94a8a65b5f8510a54523785efa6a00adb0cdae8a2f5113c199c82d1168ddc1",
+								"wide_difficulty": "0x4afbf6f881ef1f3"
+							  }],
+							  "status": "OK",
+							  "untrusted": false
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "relay_tx",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
+			"description": "Relay a list of transaction IDs.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"txids",
+					"required": true,
+					"description":"List of transactions IDs to relay",
+					"schema": {
+						"type":"array",
+						"items": {
+							"type":"string"
+						}
+					}
+				}
+			],
+			"result": {
+				"name":"status",
+				"description": "General RPC error code. 'OK' means everything looks good.",
+				"schema": {
+					"type": "string"
+				}
+			},
+			"examples": [
+				{
+					"name":"Example",
+					"description":"Example of requesting the relay of a tx with id \"9fd75c429cbe52da9a52f2ffc5fbd107fe7fd2099c0d8de274dc8a67e0c98613\"",
+					"params": [
+						{
+							"name":"txids",
+							"value": [
+								"9fd75c429cbe52da9a52f2ffc5fbd107fe7fd2099c0d8de274dc8a67e0c98613",
+								""
+							]
+						}
+					],
+					"result": {
+						"name":"ResultExample",
+						"value": {
+							"status": "OK"
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "sync_info",
+			"tags": [
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
+			"description": "Returns node's synchronisation informations. Also contains p2p and general networking informations",
+			"paramStructure":"by-name",
+			"params": [],
+			"result": {
+				"name":"SyncInfoResult",
+				"schema": {
+					"$ref": "#/components/schemas/SyncInfoResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Get synchronization information",
+					"description":"This example provide a response containing a subset of syncing informations. Ip addresses have been modified (Monero v0.18.3.1, ~11:30 AM UTC 02/28/2024)",
+					"params": [],
+					"result": {
+						"name": "SubsetExample",
+						"value": {
+							"credits": 0,
+    						"height": 1384668,
+    						"next_needed_pruning_seed": 4,
+    						"overview": "[.ooo.o.oo.o..]",
+    						"peers": [{
+    						  "info": {
+    						    "address": "152.61.2.52:18080",
+    						    "address_type": 1,
+    						    "avg_download": 0,
+    						    "avg_upload": 0,
+    						    "connection_id": "65998ac9f03d4f59bb81584cc64b5a98",
+    						    "current_download": 0,
+    						    "current_upload": 0,
+    						    "height": 0,
+    						    "host": "152.61.2.52",
+    						    "incoming": false,
+    						    "ip": "152.61.2.52",
+    						    "live_time": 2,
+    						    "local_ip": false,
+    						    "localhost": false,
+    						    "peer_id": "0000000000000000",
+    						    "port": "18080",
+    						    "pruning_seed": 0,
+    						    "recv_count": 0,
+    						    "recv_idle_time": 2,
+    						    "rpc_credits_per_hash": 0,
+    						    "rpc_port": 0,
+    						    "send_count": 313,
+    						    "send_idle_time": 2,
+    						    "state": "before_handshake",
+    						    "support_flags": 0
+    						  }
+    						},{
+    						  "info": {
+    						    "address": "25.179.1.191:18080",
+    						    "address_type": 1,
+    						    "avg_download": 1615,
+    						    "avg_upload": 0,
+    						    "connection_id": "f0a00db48a8e414bb2ad821769ff201a",
+    						    "current_download": 1793,
+    						    "current_upload": 0,
+    						    "height": 3094017,
+    						    "host": "25.179.1.191",
+    						    "incoming": false,
+    						    "ip": "25.179.1.191",
+    						    "live_time": 10,
+    						    "local_ip": false,
+    						    "localhost": false,
+    						    "peer_id": "24c5be19606d9534",
+    						    "port": "18080",
+    						    "pruning_seed": 0,
+    						    "recv_count": 16545334,
+    						    "recv_idle_time": 0,
+    						    "rpc_credits_per_hash": 0,
+    						    "rpc_port": 0,
+    						    "send_count": 4141,
+    						    "send_idle_time": 3,
+    						    "state": "synchronizing",
+    						    "support_flags": 1
+    						  }
+    						}],
+							"spans": [{
+								"connection_id": "0e88815546984f0bbcd67ff12346361b",
+								"nblocks": 20,
+								"rate": 0,
+								"remote_address": "43.100.106.18:18080",
+								"size": 0,
+								"speed": 100,
+								"start_block_height": 1384668
+							  },{
+								"connection_id": "0aa8595254374b908534dd40fd26d57d",
+								"nblocks": 20,
+								"rate": 373948,
+								"remote_address": "5.190.52.177:18080",
+								"size": 3164992,
+								"speed": 11,
+								"start_block_height": 1384688
+							}],
+							"status": "OK",
+    						"target_height": 3094017,
+    						"top_hash": "",
+    						"untrusted": false
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "get_txpool_backlog",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
+			"description": "Returns all transaction pool backlog in binary format. **IT ISN'T JSON**",
+			"paramStructure":"by-name",
+			"params": [],
+			"result": {
+				"name":"GetTxPoolBackLogResult",
+				"schema": {
+					"$ref": "#/components/schemas/GetTxPoolBackLogResponse"
+				}
+			}
 		}
 	]
 }
