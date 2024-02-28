@@ -1359,44 +1359,74 @@
 						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`). Note: This field always return false since the `sync_info` never call the bootstrap daemon"
 					}
 				}
+			},
+			"PruneBlockchainResponse": {
+				"type":"object",
+				"properties": {
+					"pruned": {
+						"type":"boolean"
+					},
+					"pruning_seed": {
+						"type":"integer",
+						"minimum": 0,
+						"description":"Block's height at which pruning began."
+					},
+					"status": {
+						"type":"string",
+						"description":"General RPC error code. \"OK\" means everything looks good."
+					},
+					"untrusted": {
+						"type": "boolean",
+						"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`). Note: This field always return false since the `sync_info` never call the bootstrap daemon"
+					}
+				}
+			},
+			"AddAuxiliaryPOWResponse": {
+				"type":"object",
+				"properties": {
+					"blocktemplate_blob":{
+						"type":"string",
+						"description":"Altered block template blob data in hex string format"
+					},
+					"blockhashing_blob":{
+						"type":"string",
+						"description":"Altered block template hash blob in hex string format"
+					},
+					"merkle_root": {
+						"type":"string",
+						"description":"No description has been provided and the author is scared of the meaning"
+					},
+					"merkle_tree_depth": {
+						"type":"integer",
+						"minimum":0,
+						"description":"No description has been provided and the author is scared of the meaning"
+					},
+					"aux_pow": {
+						"type":"array",
+						"items": {
+							"type":"object",
+							"properties": {
+								"id": {
+									"type":"string"
+								},
+								"hash": {
+									"type":"string"
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	"methods": [
 		{
 			"name": "get_block_count",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
 			"description": "Look up how many blocks are in the longest chain known to the node.",
 			"paramStructure":"by-name",
 			"params": [],
@@ -1410,6 +1440,11 @@
 		},
 		{
 			"name": "on_get_block_hash",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
 			"description": "Look up a block's hash by its height.",
 			"paramStructure":"by-name",
 			"params": [
@@ -1426,7 +1461,7 @@
 				}
 			],
 			"result": {
-				"name": "block hash",
+				"name": "OnGetBlockHashResult",
 				"schema": {
 					"type": "string"
 				}
@@ -1434,6 +1469,11 @@
 		},
 		{
 			"name": "get_block_template",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
 			"description": "Get a block template on which mining a new block.",
 			"paramStructure":"by-name",
 			"params": [
@@ -1464,6 +1504,11 @@
 		},
 		{
 			"name": "submit_block",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
 			"description": "Submit a mined block to the network.",
 			"paramStructure":"by-name",
 			"params": [
@@ -1489,7 +1534,12 @@
 		},
 		{
 			"name": "generateblocks",
-			"description": "Submit a mined block to the network.",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
+			"description": "Generate a block and specify the address to receive the coinbase reward.",
 			"paramStructure":"by-name",
 			"params": [
 				{
@@ -1529,60 +1579,17 @@
 				"name": "GenerateBlocksResponse",
 				"description": "Block submit status.",
 				"schema": {
-					"type": "object",
-					"$ref": "#/components/schemas/GenerateBlocksResponse"
-				}
-			}
-		},
-		{
-			"name": "generateblocks",
-			"description": "Submit a mined block to the network.",
-			"paramStructure":"by-name",
-			"params": [
-				{
-					"name": "amount_of_blocks",
-					"required": true,
-					"description": "Number of blocks to be generated.",
-					"schema": {
-						"type": "integer"
-					}
-				},
-				{
-					"name": "wallet_address",
-					"required": true,
-					"description": "address to receive the coinbase reward.",
-					"schema": {
-						"type": "string"
-					}
-				},
-				{
-					"name": "prev_block",
-					"required": false,
-					"description": "No description is provided since this field is deprecated",
-					"schema": {
-						"type": "string"
-					}
-				},
-				{
-					"name": "starting_nonce",
-					"required": false,
-					"description": "Increased by miner untill it finds a matching result that solves a block.",
-					"schema": {
-						"type": "integer"
-					}
-				}
-			],
-			"result": {
-				"name": "GenerateBlocksResponse",
-				"description": "Block submit status.",
-				"schema": {
-					"type": "object",
 					"$ref": "#/components/schemas/GenerateBlocksResponse"
 				}
 			}
 		},
 		{
 			"name": "get_last_block_header",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
 			"description": "Block header information for the most recent block is easily retrieved with this method. No inputs are needed.",
 			"paramStructure":"by-name",
 			"params": [
@@ -1598,13 +1605,17 @@
 			"result": {
 				"name": "GetLastBlockHeaderResponse",
 				"schema": {
-					"type": "object",
 					"$ref": "#/components/schemas/GetLastBlockHeaderResponse"
 				}
 			}
 		},
 		{
 			"name": "get_block_header_by_hash",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
 			"description": "Block header information can be retrieved using either a block's hash or height. This method includes a block's hash as an input parameter to retrieve basic information about the block.",
 			"paramStructure":"by-name",
 			"params": [
@@ -1628,13 +1639,17 @@
 			"result": {
 				"name": "GetBlockHeaderByResponse",
 				"schema": {
-					"type": "object",
 					"$ref": "#/components/schemas/GetBlockHeaderByResponse"
 				}
 			}
 		},
 		{
 			"name": "get_block_header_by_height",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
 			"description": "Similar to `get_block_header_by_hash`, this method includes a block's height as an input parameter to retrieve basic information about the block.",
 			"paramStructure":"by-name",
 			"params": [
@@ -1659,13 +1674,17 @@
 			"result": {
 				"name": "GetBlockHeaderByResponse",
 				"schema": {
-					"type": "object",
 					"$ref": "#/components/schemas/GetBlockHeaderByResponse"
 				}
 			}
 		},
 		{
 			"name": "get_block_headers_range",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
 			"description": "Similar to `get_block_header_by_height`, but for a range of blocks. This method includes a starting block height and an ending block height as parameters to retrieve basic information about the range of blocks.",
 			"paramStructure":"by-name",
 			"params": [
@@ -1699,13 +1718,17 @@
 			"result": {
 				"name": "GetBlockHeadersRangeResponse",
 				"schema": {
-					"type": "object",
 					"$ref": "#/components/schemas/GetBlockHeadersRangeResponse"
 				}
 			}
 		},
 		{
 			"name": "get_block",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
 			"description": "Full block information can be retrieved by either block height or hash, like with the above block header calls. For full block information, both lookups use the same method, but with different input parameters.",
 			"paramStructure":"by-name",
 			"params": [
@@ -1738,39 +1761,51 @@
 			"result": {
 				"name": "GetBlockResponse",
 				"schema": {
-					"type": "object",
 					"$ref": "#/components/schemas/GetBlockResponse"
 				}
 			}
 		},
 		{
 			"name": "get_connections",
+			"tags": [
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
 			"description": "Retrieve information about incoming and outgoing connections to your node. (Warning: This method is unavailable if the node have set restricted RPC)",
 			"paramStructure":"by-name",
 			"params": [],
 			"result": {
 				"name": "GetConnectionsResponse",
 				"schema": {
-					"type": "object",
 					"$ref": "#/components/schemas/GetConnectionsResponse"
 				}
 			}
 		},
 		{
 			"name": "get_info",
+			"tags": [
+				{
+					"$ref":"#/components/tags/obfuscated"
+				}
+			],
 			"description": "Retrieve general information about the state of your node and the network.",
 			"paramStructure":"by-name",
 			"params": [],
 			"result": {
 				"name": "GetInfoResponse",
 				"schema": {
-					"type": "object",
 					"$ref": "#/components/schemas/GetInfoResponse"
 				}
 			}
 		},
 		{
 			"name": "hard_fork_info",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
 			"description": "Look up information regarding hard fork voting and readiness.",
 			"paramStructure":"by-name",
 			"params": [],
@@ -1784,6 +1819,11 @@
 		},
 		{
 			"name": "set_bans",
+			"tags": [
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
 			"description": "Ban another node by IP.",
 			"paramStructure":"by-name",
 			"params": [
@@ -1820,7 +1860,7 @@
 				}
 			],
 			"result": {
-				"name": "status",
+				"name": "SetBansResponse",
 				"schema": {
 					"type": "object",
 					"properties": {
@@ -1890,11 +1930,16 @@
 		},
 		{
 			"name": "get_bans",
+			"tags": [
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
 			"description": "Get list of banned IPs.",
 			"paramStructure":"by-name",
 			"params": [],
 			"result": {
-				"name":"bans",
+				"name":"GetBansResult",
 				"description": "List of banned nodes",
 				"schema": {
 					"$ref": "#/components/schemas/GetBansResponse"
@@ -1928,6 +1973,11 @@
 		},
 		{
 			"name": "banned",
+			"tags": [
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
 			"description": "Check if an IP address is banned and for how long.",
 			"paramStructure":"by-name",
 			"params": [
@@ -1985,6 +2035,11 @@
 		},
 		{
 			"name": "flush_txpool",
+			"tags": [
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
 			"description": "Flush tx ids from transaction pool",
 			"paramStructure":"by-name",
 			"params": [
@@ -2029,24 +2084,6 @@
 				}
 			]
 		},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 		{
 			"name": "get_output_histogram",
 			"tags": [
@@ -2711,7 +2748,7 @@
 					"description":"Example of requesting necessary data for p2pool to operate",
 					"params": [],
 					"result": {
-						"name":"DistributionResult",
+						"name":"BlockTemplateResult",
 						"value": {
 							"already_generated_coins": 18403687239336866969,
     						"difficulty": "0x386d6e1a28",
@@ -2742,6 +2779,278 @@
     						  "weight": 1533
     						}],
     						"untrusted": false
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "prune_blockchain",
+			"tags": [
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
+			"description": "Can enable blockchain pruning on the node or simply check its state. **WARNING!** Checking the pruning state requires checking accross all transactions. It is I/O consuming and the node is likely to hang on during a long period of time, depending on your hardware",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"check",
+					"required":false,
+					"description":"If set to true then pruning status is checked instead of initiating pruning. (`false` by default).",
+					"schema": {
+						"type":"boolean"
+					}
+				}
+			],
+			"result": {
+				"name":"PruneBlockchainResult",
+				"schema": {
+					"$ref":"#/components/schemas/PruneBlockchainResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Checking pruning state",
+					"description":"Example of requesting the pruning state of a node",
+					"params": [
+						{
+							"name":"check",
+							"value": true
+						}
+					],
+					"result": {
+						"name":"CheckPruneResult",
+						"value": {
+							"pruned": true,
+    						"pruning_seed": 387,
+    						"status": "OK",
+    						"untrusted": false
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "calc_pow",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
+			"description": "Calculate PoW hash for a block candidate.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"major_version",
+					"required":true,
+					"description":"The major version of the monero protocol at this block height.",
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				},
+				{
+					"name":"height",
+					"required":true,
+					"description":"The height of the block candidate",
+					"schema": {
+						"type":"integer",
+						"minimum":0
+					}
+				},
+				{
+					"name":"block_blob",
+					"required":true,
+					"description":"Block blobdata in an hex string",
+					"schema": {
+						"type":"string"
+					}
+				},
+				{
+					"name":"seed_hash",
+					"required":true,
+					"description":"The major version of the monero protocol at this block height.",
+					"schema": {
+						"type":"string"
+					}
+				}
+			],
+			"result": {
+				"name":"POWResult",
+				"schema": {
+					"type":"string"
+				}
+			},
+			"examples": [
+				{
+					"name":"Requesting POW calculation",
+					"params": [
+						{
+							"name":"major_version",
+							"value": 14
+						},
+						{
+							"name":"height",
+							"value": 2286447
+						},
+						{
+							"name":"block_blob",
+							"value":"0e0ed286da8006ecdc1aab3033cf1716c52f13f9d8ae0051615a2453643de94643b550d543becd0000000002abc78b0101ffefc68b0101fcfcf0d4b422025014bb4a1eade6622fd781cb1063381cad396efa69719b41aa28b4fce8c7ad4b5f019ce1dc670456b24a5e03c2d9058a2df10fec779e2579753b1847b74ee644f16b023c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000051399a1bc46a846474f5b33db24eae173a26393b976054ee14f9feefe99925233802867097564c9db7a36af5bb5ed33ab46e63092bd8d32cef121608c3258edd55562812e21cc7e3ac73045745a72f7d74581d9a0849d6f30e8b2923171253e864f4e9ddea3acb5bc755f1c4a878130a70c26297540bc0b7a57affb6b35c1f03d8dbd54ece8457531f8cba15bb74516779c01193e212050423020e45aa2c15dcb"
+						},
+						{
+							"name":"seed_hash",
+							"value":"d432f499205150873b2572b5f033c9c6e4b7c6f3394bd2dd93822cd7085e7307"
+						}
+					],
+					"result": {
+						"name":"CalcPOWExampleResult",
+						"value": "d0402d6834e26fb94a9ce38c6424d27d2069896a9b8b1ce685d79936bca6e0a8"
+					}
+				}
+			]
+		},
+		{
+			"name": "flush_cache",
+			"tags": [
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
+			"description": "Flush bad transactions / blocks from the cache.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"bad_txs",
+					"required":false,
+					"description":"Flush bad transactions (default is `false`)",
+					"schema": {
+						"type":"boolean"
+					}
+				},
+				{
+					"name":"bad_blocks",
+					"required":false,
+					"description":"Flush bad blocks (default is `false`)",
+					"schema": {
+						"type":"boolean"
+					}
+				}
+			],
+			"result": {
+				"name":"FlushCacheResult",
+				"schema": {
+					"type":"object",
+					"properties": {
+						"status": {
+							"type":"string",
+							"description": " General RPC error code. \"OK\" means everything looks good."
+						},
+						"untrusted": {
+							"type":"boolean",
+							"description": "States if the result is obtained using the bootstrap mode, and is therefore not trusted (`true`), or when the daemon is fully synced and thus handles the RPC locally (`false`)"
+						}
+					}
+				}
+			},
+			"examples": [
+				{
+					"name":"Requesting POW calculation",
+					"params": [
+						{
+							"name":"bad_txs",
+							"value": true
+						},
+						{
+							"name":"bad_blocks",
+							"value": true
+						}
+					],
+					"result": {
+						"name":"FlushingExampleResult",
+						"value": {
+							"status": "OK",
+    						"untrusted": false
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "add_aux_pow",
+			"tags": [
+				{
+					"$ref":"#/components/tags/unrestricted"
+				}
+			],
+			"description": "Easily enable merge mining with Monero without requiring software that manually alters the extra field in the coinbase tx to include the merkle root of the aux blocks.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"blocktemplate_blob",
+					"required":true,
+					"description":"Block template's blobdata in hex string format",
+					"schema": {
+						"type":"string"
+					}
+				},
+				{
+					"name":"aux_pow",
+					"required":true,
+					"description":"Auxiliary block informations to add to the coinbase tx's extra field",
+					"schema": {
+						"type":"array",
+						"items": {
+							"type":"object",
+							"properties":{
+								"id": {
+									"type":"string"
+								},
+								"hash":{
+									"type":"string"
+								}
+							}
+						}
+					}
+				}
+			],
+			"result": {
+				"name":"AddAuxiliaryPOWResult",
+				"schema": {
+					"$ref":"#/components/schemas/AddAuxiliaryPOWResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Requesting POW calculation",
+					"params": [
+						{
+							"name":"blocktemplate_blob",
+							"value": "..."
+						},
+						{
+							"name":"aux_pow",
+							"value": [
+								{
+									"id":"3200b4ea97c3b2081cd4190b58e49572b2319fed00d030ad51809dff06b5d8c8",
+									"hash":"7b35762de164b20885e15dbe656b1138db06bb402fa1796f5765a23933d8859a"
+								}
+							]
+						}
+					],
+					"result": {
+						"name":"AddAuxPOWExampleResult",
+						"value": {
+							"aux_pow": [{
+								"hash": "7b35762de164b20885e15dbe656b1138db06bb402fa1796f5765a23933d8859a",
+								"id": "3200b4ea97c3b2081cd4190b58e49572b2319fed00d030ad51809dff06b5d8c8"
+							}],
+							"blockhashing_blob": "1010ee97e2a106e9f8ebe8887e5b609949ac8ea6143e560ed13552b110cb009b21f0cfca1eaccf00000000b2685c1283a646bc9020c758daa443be145b7370ce5a6efacb3e614117032e2c22",
+							"blocktemplate_blob": " ... ",
+							"merkle_root": "7b35762de164b20885e15dbe656b1138db06bb402fa1796f5765a23933d8859a",
+							"merkle_tree_depth": 0,
+							"status": "OK",
+							"untrusted": false
 						}
 					}
 				}
