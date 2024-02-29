@@ -1,0 +1,186 @@
+{
+	"openrpc": "1.2.6",
+	"info": {
+		"title": "Monero Wallet RPC",
+		"description": "JSON-RPC API for interacting with monero-wallet-rpc. The program monero-wallet-rpc replaced the rpc interface that was in simplewallet and then monero-wallet-cli. Like monero daemon, if authentication has been setup, user have to make sure to send the username and credentials in the `Authorization` HTTP Header.\n\nNote: *\"atomic units\"* refer to the smallest fraction of monero according to the monerod implementation. **1 XMR = 1e12 [atomic units](https://www.getmonero.org/resources/moneropedia/atomic-units.html).**",
+		"license": {
+			"name": "MIT License",
+			"url": "https://opensource.org/licenses/mit-license.php"
+		},
+		"version": "v1.4.5.0",
+		"x-wallet-rpc-version": {
+			"major":1,
+			"minor":27
+		}
+	},
+	"servers": [
+		{
+			"url": "http://{host}:{port}/json_rpc",
+			"name": "Monero Wallet address",
+			"summary": "Address of the monero-wallet-rpc to interact with"
+		}
+	],
+	"components": {
+		"tags": {
+			"restricted": {
+				"name":"Restricted",
+				"description":"This method is disabled if monero-wallet-rpc is set to restrict its RPC. Using this method on a restricted wallet will return an explicit error message"
+			},
+			"sensitive": {
+				"name":"Sensitive",
+				"description":"This method is disabled if the node isn't trusted. Using this method on an untrusted node causes privacy or security risks to the user's wallet"
+			}
+		},
+		"schemas": {
+			
+		}
+	},
+	"methods": [
+		{
+			"name":"set_daemon",
+			"tags":[
+				{
+					"$ref":"#/components/tags/restricted"
+				}
+			],
+			"description":"Initiate RPC server connection to a Monero daemon.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"address",
+					"required":true,
+					"description":"The URL of the daemon to connect to. If not set, monero-wallet-rpc will return an error",
+					"schema":{
+						"type":"string"
+					}
+				},
+				{
+					"name":"trusted",
+					"required":false,
+					"description":"Indicate to monero-wallet-rpc if it is authorized to use sensitive methods. If set to `false`, these sensitive methods will be disabled (Default: `false`)",
+					"schema":{
+						"type":"boolean"
+					}
+				},
+				{
+					"name":"ssl_support",
+					"required":false,
+					"description":"Set TLS usage for the node. accepted values: `disabled`|`enabled`|`autodetect` (Default is `autodetect`)",
+					"schema": {
+						"type":"boolean"
+					}
+				},
+				{
+					"name":"ssl_private_key_path",
+					"required":false,
+					"description":"The file path location of the SSL key",
+					"schema":{
+						"type":"string"
+					}
+				},
+				{
+					"name":"ssl_certificate_path",
+					"required":false,
+					"description":"The file path location of the certificate authority file.",
+					"schema":{
+						"type":"string"
+					}
+				},
+				{
+					"name":"ssl_allowed_fingerprints",
+					"required":false,
+					"description":"The SHA1 fingerprints accepted by the SSL certificate.",
+					"schema":{
+						"type":"array",
+						"items": {
+							"descripion":"An SHA1 fingerprint in `AB:CD:EF:GH:IJ:...` format",
+							"type":"string"
+						}
+					}
+				},
+				{
+					"name":"ssl_allow_any_cert",
+					"required":false,
+					"description":"If `true`, the wallet RPC will accept any incoming SSL certificate. If `false`, the certificate must be signed by a trusted certificate authority. (Default: `false`)",
+					"schema":{
+						"type":"boolean"
+					}
+				},
+				{
+					"name":"username",
+					"required":false,
+					"description":"Monero daemon's username credential",
+					"schema":{
+						"type":"string"
+					}
+				},
+				{
+					"name":"password",
+					"required":false,
+					"description":"Monero daemon's password credential",
+					"schema":{
+						"type":"string"
+					}
+				}
+			],
+			"result":{
+				"name":"SetDaemonResult",
+				"schema":{}
+			},
+			"examples": [
+				{
+					"name":"Connecting to http://node.monerodevs.org:18089",
+					"description":"Example of requesting monero-wallet to connect to the monero daemon `http://node.monerodevs.org:18089`. The node is trusted and the ssl keys and certificates can be found at the supplied file paths",
+					"params": [
+						{
+							"name":"address",
+							"value":"http://node.monerodevs.org:18089"
+						},
+						{
+							"name":"trusted",
+							"value":true
+						},
+						{
+							"name":"ssl_private_key_path",
+							"value":"path/to/ssl/key"
+						},
+						{
+							"name":"ssl_certificate_path",
+							"value":"path/to/ssl/certificate"
+						},
+						{
+							"name":"ssl_ca_file",
+							"value":"path/to/ssl/ca/file"
+						},
+						{
+							"name":"ssl_allowed_fingerprints",
+							"value":["85:A7:68:29:BE:73:49:80:84:91:7A:BB:1F:F1:AD:7E:43:FE:CC:B8"]
+						},
+						{
+							"name":"ssl_allow_any_cert",
+							"value":true
+						}
+					],
+					"result": {
+						"name":"SetDaemonResultExample",
+						"value": {}
+					}
+				},
+				{
+					"name":"Connecting to untrusted http://xmr-node-uk.cakewallet.com:18081 without SSL",
+					"description":"Example of requesting monero-wallet to connect to the monero daemon `http://xmr-node-uk.cakewallet.com:18081`. The node is untrusted and no SSL keys are submitted",
+					"params": [
+						{
+							"name":"address",
+							"value":"http://xmr-node-uk.cakewallet.com:18081"
+						}
+					],
+					"result": {
+						"name":"SetDaemonResultExample",
+						"value": {}
+					}
+				}
+			]
+		}
+	]
+}

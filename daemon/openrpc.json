@@ -2,16 +2,16 @@
 	"openrpc": "1.2.6",
 	"info": {
 		"title": "Monero Daemon RPC",
-		"description": "JSON-RPC API for interacting with monero daemon (Actual RPC standard is based on monerod)",
+		"description": "JSON-RPC API for interacting with monero daemon (Actual RPC standard is based on monerod). If authentication has been setup, user have to make sure to send the username and credentials in the `Authorization` HTTP Header",
 		"license": {
 			"name": "MIT License",
 			"url": "https://opensource.org/licenses/mit-license.php"
 		},
-		"version": "v1.4.5.0"
-	},
-	"externalDocs": {
-		"description": "Official Documentation",
-		"url": "https://github.com/monero-project/monero/blob/master/doc/rpc_api.md#daemon-rpc-calls"
+		"version": "v1.4.5.0",
+		"x-core-rpc-version": {
+			"major":3,
+			"minor":13
+		}
 	},
 	"servers": [
 		{
