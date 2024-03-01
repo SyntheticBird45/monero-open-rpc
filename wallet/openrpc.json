@@ -2,7 +2,7 @@
 	"openrpc": "1.2.6",
 	"info": {
 		"title": "Monero Wallet RPC",
-		"description": "JSON-RPC API for interacting with monero-wallet-rpc. The program monero-wallet-rpc replaced the rpc interface that was in simplewallet and then monero-wallet-cli. Like monero daemon, if authentication has been setup, user have to make sure to send the username and credentials in the `Authorization` HTTP Header.\n\nNote: *\"atomic units\"* refer to the smallest fraction of monero according to the monerod implementation. **1 XMR = 1e12 [atomic units](https://www.getmonero.org/resources/moneropedia/atomic-units.html).**",
+		"description": "JSON-RPC API for interacting with monero-wallet-rpc. The program monero-wallet-rpc replaced the rpc interface that was in simplewallet and then monero-wallet-cli. Like monero daemon, if authentication has been setup, user have to make sure to send the username and credentials in the `Authorization` HTTP Header.\n\nNote: \n- *\"atomic units\"* refer to the smallest fraction of monero according to the monerod implementation. **1 XMR = 1e12 [atomic units](https://www.getmonero.org/resources/moneropedia/atomic-units.html).**\n- An account or address index is it's time-based place in the entire list. eg. Primary account is account of index 0, Primary address is the address of index 0. Address with an index > 0 is a *subaddress*",
 		"license": {
 			"name": "MIT License",
 			"url": "https://opensource.org/licenses/mit-license.php"
@@ -114,6 +114,44 @@
 						"description":"Time (in seconds) before subaddress's balance is safe to spend. (~ `blocks_to_unlock` // 120)"
 					}
 				}
+			},
+			"AddressInfo":{
+				"type":"object",
+				"properties":{
+					"address":{
+						"type":"string",
+						"description":"The (sub)address represented in base58."
+					},
+					"label":{
+						"type":"string",
+						"description":"Label of the (sub)address"
+					},
+					"address_index":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Index of the (sub)address."
+					},
+					"used":{
+						"type":"boolean",
+						"description":"`true` means this (sub)address has already received funds"
+					}
+				}
+			},
+			"GetAddressResponse":{
+				"type":"object",
+				"properties":{
+					"address": {
+						"type":"string",
+						"description":"The primary address in base58 string."
+					},
+					"addresses": {
+						"type":"array",
+						"description":"array of address information entries.",
+						"items":{
+							"$ref":"#/components/schemas/AddressInfo"
+						}
+					}
+				}
 			}
 		}
 	},
@@ -131,7 +169,7 @@
 				{
 					"name":"address",
 					"required":true,
-					"description":"The URL of the daemon to connect to. If not set, monero-wallet-rpc will return an error",
+					"description":"The URL of the daemon to connect to. If not set, monero-wallet-rpc will resolve to http://localhost:{RPC_DEFAULT_PORT}",
 					"schema":{
 						"type":"string"
 					}
@@ -266,6 +304,7 @@
 		},
 		{
 			"name":"get_balance",
+			"x-rpc-aliases":["getbalance"],
 			"tags":[],
 			"description":"Alias: `getbalance`\n\nReturn the requested account wallet's balance.",
 			"paramStructure":"by-name",
@@ -358,6 +397,80 @@
     						}],
     						"time_to_unlock": 0,
     						"unlocked_balance": 157443303037455077
+						}
+					}
+				}
+			]
+		},
+		{
+			"name":"get_address",
+			"x-rpc-aliases":["getaddress"],
+			"tags":[],
+			"description":"Alias: `getaddress`\n\nReturn the wallet's addresses for an account. Optionally filter for specific set of subaddresses.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"account_index",
+					"required":true,
+					"description":"Account to which returning the balance from",
+					"schema":{
+						"type":"integer",
+						"minimum":0
+					}
+				},
+				{
+					"name":"address_index",
+					"required":false,
+					"description":"List of address indices to return for the account. (Default is to return all of them)",
+					"schema":{
+						"type":"array",
+						"items":{
+							"type":"integer",
+							"minimum":0
+						}
+					}
+				}
+			],
+			"result":{
+				"name":"GetAddressResult",
+				"schema":{
+					"$ref":"#/components/schemas/GetAddressResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Fetching primary account and 3 other addresses",
+					"description":"This example show how to fetch address informations for the primary account of the wallet. It request informations of the primary address (index: 0), and  subaddresses 1 and 4",
+					"params":[
+						{
+							"name":"account_index",
+							"value":0
+						},
+						{
+							"name":"address_index",
+							"value":[0,1,4]
+						}
+					],
+					"result":{
+						"name":"GetAddressResultExample",
+						"value":{
+							"address": "55LTR8KniP4LQGJSPtbYDacR7dz8RBFnsfAKMaMuwUNYX6aQbBcovzDPyrQF9KXF9tVU6Xk3K8no1BywnJX6GvZX8yJsXvt",
+    						"addresses": [{
+    							"address": "55LTR8KniP4LQGJSPtbYDacR7dz8RBFnsfAKMaMuwUNYX6aQbBcovzDPyrQF9KXF9tVU6Xk3K8no1BywnJX6GvZX8yJsXvt",
+    							"address_index": 0,
+    							"label": "Primary account",
+    							"used": true
+    						},{
+    							"address": "7BnERTpvL5MbCLtj5n9No7J5oE5hHiB3tVCK5cjSvCsYWD2WRJLFuWeKTLiXo5QJqt2ZwUaLy2Vh1Ad51K7FNgqcHgjW85o",
+    							"address_index": 1,
+    							"label": "",
+    							"used": true
+    						},{
+    							"address": "77xa6Dha7kzCQuvmd8iB5VYoMkdenwCNRU9khGhExXQ8KLL3z1N1ZATBD1sFPenyHWT9cm4fVFnCAUApY53peuoZFtwZiw5",
+    							"address_index": 4,
+    							"label": "test2",
+    							"used": true
+    						}]
 						}
 					}
 				}
