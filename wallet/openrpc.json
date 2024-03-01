@@ -152,12 +152,33 @@
 						}
 					}
 				}
+			},
+			"GetAddressIndexResponse":{
+				"type":"object",
+				"properties":{
+					"index": {
+						"type":"object",
+						"properties":{
+							"major":{
+								"type":"integer",
+								"minimum":0,
+								"description":"Account index"
+							},
+							"minor":{
+								"type":"integer",
+								"minimum":0,
+								"description":"Address index"
+							}
+						}
+					}
+				}
 			}
 		}
 	},
 	"methods": [
 		{
 			"name":"set_daemon",
+			"x-rpc-aliases":[],
 			"tags":[
 				{
 					"$ref":"#/components/tags/restricted"
@@ -471,6 +492,50 @@
     							"label": "test2",
     							"used": true
     						}]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name":"get_address_index",
+			"x-rpc-aliases":[],
+			"tags":[],
+			"description":"Get account and address indexes from a specific (sub)address.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"address",
+					"required":true,
+					"description":"Subaddress base58 public key to look for",
+					"schema":{
+						"type":"string"
+					}
+				}
+			],
+			"result":{
+				"name":"GetAddressIndexResult",
+				"schema":{
+					"$ref":"#/components/schemas/GetAddressIndexResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Fetching an address index",
+					"description":"This example show how to get the index of the address \"7BnERTpvL5MbCLtj5n9No7J5oE5hHiB3tVCK5cjSvCsYWD2WRJLFuWeKTLiXo5QJqt2ZwUaLy2Vh1Ad51K7FNgqcHgjW85o\" in the wallet",
+					"params":[
+						{
+							"name":"address",
+							"value":"7BnERTpvL5MbCLtj5n9No7J5oE5hHiB3tVCK5cjSvCsYWD2WRJLFuWeKTLiXo5QJqt2ZwUaLy2Vh1Ad51K7FNgqcHgjW85o"
+						}
+					],
+					"result":{
+						"name":"GetAddressIndexResultExample",
+						"value":{
+							"index": {
+								"major": 0,
+								"minor": 1
+							}
 						}
 					}
 				}
