@@ -7,7 +7,7 @@
 			"name": "MIT License",
 			"url": "https://opensource.org/licenses/mit-license.php"
 		},
-		"version": "v1.4.5.0",
+		"version": "v1.27",
 		"x-wallet-rpc-version": {
 			"major":1,
 			"minor":27
@@ -32,7 +32,89 @@
 			}
 		},
 		"schemas": {
-			
+			"GetBalanceResponse":{
+				"type":"object",
+				"properties": {
+					"balance":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Total account's balance, in atomic units"
+					},
+					"unlocked_balance":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Unlocked account's balance, in atomic units"
+					},
+					"multisig_import_needed":{
+						"type":"boolean",
+						"description":"If `true`, this means the wallet-rpc require importing multisig shard to properly returning the account's balance"
+					},
+					"per_subaddress":{
+						"type":"array",
+						"items":{
+							"$ref":"#/components/schemas/PerSubaddressInfo"
+						}
+					},
+					"time_to_unlock":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Time (in seconds) before balance is safe to spend."
+					},
+					"blocks_to_unlock":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Number of blocks before balance is safe to spend (10 blocks after the youngest output)"
+					}
+				}
+			},
+			"PerSubaddressInfo":{
+				"type":"object",
+				"properties":{
+					"account_index":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Index of the account."
+					},
+					"address_index":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Index of the subaddress in the account."
+					},
+					"address":{
+						"type":"string",
+						"description":"The subaddress. Representation of the public key in base58"
+					},
+					"balance":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Total Balance for the subaddress"
+					},
+					"unlocked_balance":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Unlocked balance for the subaddress"
+					},
+					"label":{
+						"type":"string",
+						"description":"Label for the subaddress"
+					},
+					"num_unspent_outputs":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Number of unspent outputs"
+					},
+					"blocks_to_unlock":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Number of blocks before subaddress's balance is safe to spend (10 blocks after its youngest output)"
+					},
+					"time_to_unlock":{
+						"type":"integer",
+						"minimum":0,
+						"description":"Time (in seconds) before subaddress's balance is safe to spend. (~ `blocks_to_unlock` // 120)"
+					}
+				}
+			}
 		}
 	},
 	"methods": [
@@ -178,6 +260,105 @@
 					"result": {
 						"name":"SetDaemonResultExample",
 						"value": {}
+					}
+				}
+			]
+		},
+		{
+			"name":"get_balance",
+			"tags":[],
+			"description":"Alias: `getbalance`\n\nReturn the requested account wallet's balance.",
+			"paramStructure":"by-name",
+			"params": [
+				{
+					"name":"account_index",
+					"required":true,
+					"description":"Account to which returning the balance from",
+					"schema":{
+						"type":"integer",
+						"minimum":0
+					}
+				},
+				{
+					"name":"address_indices",
+					"required":false,
+					"description":"Return balance detail for those subaddresses.",
+					"schema":{
+						"type":"array",
+						"items":{
+							"type":"integer",
+							"minimum":0
+						}
+					}
+				},
+				{
+					"name":"all_acounts",
+					"required":false,
+					"description":"If set to `true`, monero-wallet-rpc will return balance detail of all accounts (Defaults to `false`)",
+					"schema": {
+						"type":"boolean"
+					}
+				},
+				{
+					"name":"strict",
+					"required":false,
+					"description":"If set to `true`, all changes go to 0-th subaddress, in the current subaddress account (Defaults to `false`)",
+					"schema": {
+						"type":"boolean"
+					}
+				}
+			],
+			"result":{
+				"name":"GetBalanceResult",
+				"schema":{
+					"$ref":"#/components/schemas/GetBalanceResponse"
+				}
+			},
+			"examples": [
+				{
+					"name":"Fetching primary account and first two subaddress",
+					"description":"This example show how to fetch balance informations for the primary account of the wallet, and its two first subaddresses",
+					"params":[
+						{
+							"name":"account_index",
+							"value":0
+						},
+						{
+							"name":"address_indices",
+							"value":[0,1]
+						}
+					],
+					"result":{
+						"name":"GetBalanceResultExample",
+						"value":{
+							"balance": 157443303037455077,
+    						"blocks_to_unlock": 0,
+    						"multisig_import_needed": false,
+    						"per_subaddress": [{
+    							"account_index": 0,
+    							"address": "55LTR8KniP4LQGJSPtbYDacR7dz8RBFnsfAKMaMuwUNYX6aQbBcovzDPyrQF9KXF9tVU6Xk3K8no1BywnJX6GvZX8yJsXvt",
+    							"address_index": 0,
+    							"balance": 157360317826255077,
+    							"blocks_to_unlock": 0,
+    							"label": "Primary account",
+    							"num_unspent_outputs": 5281,
+    							"time_to_unlock": 0,
+    							"unlocked_balance": 157360317826255077
+    						},
+							{
+    							"account_index": 0,
+    							"address": "7BnERTpvL5MbCLtj5n9No7J5oE5hHiB3tVCK5cjSvCsYWD2WRJLFuWeKTLiXo5QJqt2ZwUaLy2Vh1Ad51K7FNgqcHgjW85o",
+    							"address_index": 1,
+    							"balance": 59985211200000,
+    							"blocks_to_unlock": 0,
+    							"label": "",
+    							"num_unspent_outputs": 1,
+    							"time_to_unlock": 0,
+    							"unlocked_balance": 59985211200000
+    						}],
+    						"time_to_unlock": 0,
+    						"unlocked_balance": 157443303037455077
+						}
 					}
 				}
 			]
